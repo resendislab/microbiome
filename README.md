@@ -4,3 +4,4 @@ This repo contains the standardized analysis pipeline for 16S and metagenome dat
 
 - For suggestions, open questions and bugs please use the [issue tracker](https://github.com/cdiener/microbiome/issues). 
 - Different pipelines are managed via branches. The master branch points to the default pipeline.
+- The project itself is managed in the [Trello Board](https://trello.com/b/rHtrpyiz/microbiome)
