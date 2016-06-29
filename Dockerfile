@@ -12,7 +12,6 @@ RUN cd /tmp && \
     ncbi-blast-2.4.0+/bin/makeblastdb /usr/bin
 
 # Setup dependencies
-COPY mbtools /tmp/mbtools
-RUN Rscript -e "library(BiocInstaller); biocLite('devtools'); \
-    setRepositories(ind=1:2); devtools::install('/tmp/mbtools')" \
+RUN Rscript -e "install.packages('devtools'); setRepositories(ind=1:2); \
+    devtools::install_github('cdiener/microbiome/mbtools')" \
     && rm -rf /tmp/*
