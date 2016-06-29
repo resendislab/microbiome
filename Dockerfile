@@ -9,7 +9,8 @@ RUN cd /tmp && \
     wget ftp://ftp.ncbi.nlm.nih.gov/pub/agarwala/bmtagger/extract_fullseq && \
     wget  ftp://ftp.ncbi.nlm.nih.gov/pub/agarwala/bmtagger/srprism && \
     cp bm* extract_fullseq srprism ncbi-blast-2.4.0+/bin/blastn \
-    ncbi-blast-2.4.0+/bin/makeblastdb /usr/bin
+    ncbi-blast-2.4.0+/bin/makeblastdb /usr/bin && \
+    cd /usr/bin && chmod +x bm* extract_fullseq srprism
 
 # Setup dependencies
 RUN Rscript -e "install.packages('devtools'); setRepositories(ind=1:2); \
