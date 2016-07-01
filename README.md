@@ -1,18 +1,18 @@
 [![Build Status](https://travis-ci.org/cdiener/microbiome.svg?branch=master)](https://travis-ci.org/cdiener/microbiome)
-[![Docker Pulls](https://img.shields.io/docker/pulls/cdiener/microbiome.svg?maxAge=2592000)]()
+[![Docker Pulls](https://img.shields.io/docker/pulls/cdiener/microbiome.svg?maxAge=2592000)](https://hub.docker.com/r/cdiener/microbiome/)
 
 # Microbiome project pipeline
 
-This repo contains the standardized analysis pipeline for 16S and metagenome data. It serves as a testing ground for what will be required to analyze around 500 samples. 
+This repo contains the standardized analysis pipeline for 16S and metagenome data. It serves as a testing ground for what will be required to analyze around 500 samples.
 
-- For suggestions, open questions and bugs please use the [issue tracker](https://github.com/cdiener/microbiome/issues). 
+- For suggestions, open questions and bugs please use the [issue tracker](https://github.com/cdiener/microbiome/issues).
 - Different pipelines are managed via branches. The master branch points to the default pipeline.
 - The project itself is managed in the [Trello Board](https://trello.com/b/rHtrpyiz/microbiome)
 
 ## Installation
 
-If you want to perform Human sequence removal you will need [bmtagger](ftp://ftp.ncbi.nlm.nih.gov/pub/agarwala/bmtagger/) installed. The tools are bundled in the `mbtools` R package which also depends on all additional packages you need to run 
-the analyses. You will need to [install bioconductor first](https://www.bioconductor.org/install/) followed by running 
+If you want to perform Human sequence removal you will need [bmtagger](ftp://ftp.ncbi.nlm.nih.gov/pub/agarwala/bmtagger/) installed. The tools are bundled in the `mbtools` R package which also depends on all additional packages you need to run
+the analyses. You will need to [install bioconductor first](https://www.bioconductor.org/install/) followed by running
 
 ```R
 install.packages('devtools')
