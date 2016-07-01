@@ -2,6 +2,6 @@
 ##
 ## Apache license 2.0. See LICENSE for more information.
 
-#' @import dada2 ShortRead phangorn msa
+#' @import dada2 ShortRead phangorn msa utils
 #' @importFrom data.table as.data.table
 NULL
