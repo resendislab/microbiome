@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/cdiener/microbiome.svg?branch=master)](https://travis-ci.org/cdiener/microbiome)
+[![Docker Pulls](https://img.shields.io/docker/pulls/cdiener/microbiome.svg?maxAge=2592000)]()
+
 # Microbiome project pipeline
 
 This repo contains the standardized analysis pipeline for 16S and metagenome data. It serves as a testing ground for what will be required to analyze around 500 samples. 
