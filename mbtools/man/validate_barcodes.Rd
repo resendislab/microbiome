@@ -4,15 +4,15 @@
 \alias{validate_barcodes}
 \title{Validates sequences barcodes versus a reference.}
 \usage{
-validate_barcodes(reads, out, index, ref, max_ed = 2)
+validate_barcodes(reads, index, out, ref, max_ed = 1)
 }
 \arguments{
 \item{reads}{A character vector containing the read files in fastq format.}
 
-\item{out}{A folder to which to save the filtered fastq files.}
-
 \item{index}{The index file containing the demultiplexed barcodes for each
 read file.}
+
+\item{out}{A folder to which to save the filtered fastq files.}
 
 \item{ref}{A character vector or DNAStringSet containing the reference
 barcodes.}
@@ -26,7 +26,7 @@ A numeric vector containing three entries, where the first defines the
  \itemize{
  \item{The number of reads that could be mapped uniquely.}
  \item{The number of reads for which no match was found.}
- \item{The number of reads for which more than one refeence match was found.}
+ \item{The number of reads for which more than one reference match was found.}
  }
 }
 \description{

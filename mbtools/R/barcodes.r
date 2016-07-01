@@ -29,20 +29,34 @@
 #'
 #' @export
 validate_barcodes <- function(reads, index, out, ref, max_ed=1) {
-    stream <- open(FastqStreamer(index))
-    on.exit(close(stream))
+    istream <- FastqStreamer(index)
+    on.exit(close(istream))
+
+    rstream <- lapply(reads, FastqStreamer)
 
     dir.create(out)
     res <- c(unique=0, nomatch=0, multiple=0)
 
     repeat {
-        fq <- yield(stream)
+        fq <- yield(istream)
         if (length(fq) == 0) break
 
+        ids <- sub("/.+$", "", id(fq))
+
         hits <- rowSums(as.data.table(srdistance(fq, ref)) <= max_ed)
-        writeFastq(fq[hits == 1], paste0(out, "/", index), "a")
+
+        for (i in 1:length(rstream)) {
+            rfq <- yield(rstream[[i]])
+            rids <- sub("/.+$", "", id(rfq))
+            if (any(rids != ids)) stop("Index file and reads do not match!")
+            fn <- basename(reads[i])
+            writeFastq(rfq[hits == 1], paste0(out, "/", fn), "a")
+        }
+
+        writeFastq(fq[hits == 1], paste0(out, "/", basename(index)), "a")
         res <- res + c(sum(hits == 1), sum(hits == 0), sum(hits > 1))
     }
+    for (s in rstream) { close(s) }
 
     return(res)
 }
