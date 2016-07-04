@@ -20,3 +20,6 @@ vignettes/*.pdf
 
 # mock data
 mock
+
+# Wercker
+_*
