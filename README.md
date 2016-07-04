@@ -1,4 +1,5 @@
 [![wercker status](https://app.wercker.com/status/ef9cd211a697b9ae558269dab4ee619e/s "wercker status")](https://app.wercker.com/project/bykey/ef9cd211a697b9ae558269dab4ee619e)
+[![codecov](https://codecov.io/gh/cdiener/microbiome/branch/master/graph/badge.svg)](https://codecov.io/gh/cdiener/microbiome)
 [![Docker Pulls](https://img.shields.io/docker/pulls/cdiener/microbiome.svg?maxAge=2592000)](https://hub.docker.com/r/cdiener/microbiome/)
 
 # Microbiome project pipeline
