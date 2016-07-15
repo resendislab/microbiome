@@ -45,6 +45,7 @@ find_taxa <- function(taxa1, taxa2, level="Species") {
         stop("level must be a valid column name in both tables!")
 
     levels <- unique(taxa1[, level])
+    levels <- levels[!is.na(levels) & nchar(levels) > 0]
     found <- levels %in% unique(taxa2[, level])
 
     return(data.frame(level=levels, found=found))

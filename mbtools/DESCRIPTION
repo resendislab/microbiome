@@ -9,6 +9,7 @@ Depends:
 Imports:
     data.table,
     RCurl,
+    Biostrings,
     ShortRead,
     phangorn,
     msa,

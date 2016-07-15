@@ -4,7 +4,7 @@
 \alias{split_barcodes}
 \title{Splits FASTQ files into individual samples.}
 \usage{
-split_barcodes(reads, index, out, ref, snames = NULL, max_ed = 1)
+split_barcodes(reads, index, out, ref, n = 1e+05, max_ed = 1)
 }
 \arguments{
 \item{reads}{A character vector containing the read files in fastq format.}
@@ -16,6 +16,8 @@ read file.}
 
 \item{ref}{A character vector or DNAStringSet containing the reference
 barcodes.}
+
+\item{n}{Maximum number of records to read in each iteration.}
 
 \item{max_ed}{Maximum allowed edit distance between the sequenced and
 reference barcode.}

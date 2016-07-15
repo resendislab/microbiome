@@ -16,6 +16,7 @@
 #'  barcodes.
 #' @param max_ed Maximum allowed edit distance between the sequenced and
 #'  reference barcode.
+#' @param n Maximum number of records to read in each iteration.
 #' @return A numeric vector containing three entries, where the first defines the
 #'  reads that are kept.
 #'  \itemize{
@@ -27,78 +28,61 @@
 #'  NULL
 #'
 #' @export
-split_barcodes <- function(reads, index, out, ref, snames=NULL, max_ed=1) {
-    if (is.null(snames)) snames <- paste0("S", 1:length(ref))
-    ref <- DNAStringSet(ref)
+#' @importFrom Biostrings reverseComplement
+split_barcodes <- function(reads, index, out, ref, n=1e5, max_ed=1) {
+    if (is.null(names(ref))) snames <- paste0("S", 1:length(ref))
+    else snames <- names(ref)
 
-    istream <- FastqStreamer(index)
+    ref <- DNAStringSet(ref)
+    nref <- length(ref)
+    ref <- c(ref, reverseComplement(ref))
+
+    istream <- FastqStreamer(index, n=n)
     on.exit(close(istream))
 
-    rstream <- lapply(reads, FastqStreamer)
+    rstream <- lapply(reads, FastqStreamer, n=n)
 
     if (dir.exists(out)) {
         unlink(file.path(out, "*.fastq.gz"))
     } else dir.create(out)
     res <- c(unique=0, nomatch=0, multiple=0)
+    nseq <- 0
 
+    cat("Aligning barcodes:")
     repeat {
         fq <- yield(istream)
         if (length(fq) == 0) break
 
-        ids <- sub("/.+$", "", id(fq))
+        ids <- sub("[/\\s].+$", "", id(fq), perl=TRUE)
 
-        hits <- as.data.table(srdistance(fq, ref)) <= max_ed
+        hits <- do.call(cbind, srdistance(fq, ref)) <= max_ed
         inds <- apply(hits, 1, function(x) {
-            id <- which(x)
-            if (length(id) != 1) return(NA)
-            else return(id)
+            i <- unique(which(x) %% nref) + 1
+            if (length(i) == 0) return(-1)
+            if (length(i) > 1) return(0)
+            else return(i)
         })
-
 
         for (i in 1:length(rstream)) {
             rfq <- yield(rstream[[i]])
-            rids <- sub("/.+$", "", id(rfq))
-            if (any(rids != ids)) stop("Index file and reads do not match!")
+            rids <- sub("[/\\s].+$", "", id(rfq), perl=TRUE)
+            if (any(rids != ids)) {
+                sapply(rstream, close)
+                stop("Index file and reads do not match!")
+            }
             fn <- basename(reads[i])
 
-            for (sid in 1:length(ref)) {
+            for (sid in 1:nref) {
                 writeFastq(rfq[inds == sid], file.path(out, paste0(snames[sid], "_", fn)), "a")
             }
         }
-
-        hits <- rowSums(hits)
-        res <- res + c(sum(hits == 1), sum(hits == 0), sum(hits > 1))
+        nseq <- nseq + length(fq)
+        res <- res + c(sum(inds > 0), sum(inds == 0), sum(inds < 0))
+        cat("                                            \r")
+        cat(sprintf("Aligning barcodes: finished %d sequences...", nseq))
     }
-    for (s in rstream) { close(s) }
-
-    return(res)
-}
-
-#' Assigns sample IDs from barcodes
-#'
-#' @param index Path to the FASTQ index file.
-#' @param A vector of barcodes, one for each sample.
-#' @return A vector with an ID for each sample in the index file.
-#' @examples
-#'  NULL
-#'
-#' @export
-#' @importFrom Biostrings DNAStringSet
-assign_barcodes <- function(index, barcodes) {
-    istream <- FastqStreamer(index)
-    on.exit(close(istream))
-    barcodes <- DNAStringSet(barcodes)
-
-    res <- NULL
-
-    repeat {
-        fq <- yield(istream)
-        if (length(fq) == 0) break
-
-        dists <- as.data.table(srdistance(fq, barcodes))
-        ids <- apply(dists, 1, function(x) which(x == 0))
-        res <- append(res, ids)
-    }
+    sapply(rstream, close)
+    cat("\n")
 
     return(res)
 }
