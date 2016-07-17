@@ -28,13 +28,15 @@
 #'  NULL
 #'
 #' @export
-#' @importFrom Biostrings reverseComplement
+#' @importFrom Biostrings DNAStringSet reverseComplement
 split_barcodes <- function(reads, index, out, ref, n=1e5, max_ed=1) {
     if (is.null(names(ref))) snames <- paste0("S", 1:length(ref))
     else snames <- names(ref)
 
     ref <- DNAStringSet(ref)
     nref <- length(ref)
+    if (nref < 2)
+        stop("There is only one sample. Barcode filtering is not necessary!")
     ref <- c(ref, reverseComplement(ref))
 
     istream <- FastqStreamer(index, n=n)

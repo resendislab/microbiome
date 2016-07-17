@@ -44,9 +44,73 @@ find_taxa <- function(taxa1, taxa2, level="Species") {
     if (!(level %in% colnames(taxa1) && level %in% colnames(taxa2)))
         stop("level must be a valid column name in both tables!")
 
-    levels <- unique(taxa1[, level])
-    levels <- levels[!is.na(levels) & nchar(levels) > 0]
-    found <- levels %in% unique(taxa2[, level])
+    index <- which(colnames(taxa1) == level)
+    snames <- unique(apply(taxa1[, 1:index], 1, paste, collapse=";"))
+    snames <- snames[!is.na(snames) & nchar(snames) > 0]
+    snames_ref <- apply(taxa2[, 1:index], 1, paste, collapse=";")
+    found <- snames %in% snames_ref
+    names(found) <- snames
 
-    return(data.frame(level=levels, found=found))
+    return(found)
+}
+
+#' Creates a barplot of found taxa on each level of the taxonomy.
+#'
+#'
+#' @param taxa1 First taxonomy table.
+#' @param taxa2 Second taxonomy table.
+#' @return A bar plot denoting the percentage of correctly identified taxa.
+#' @examples
+#'  NULL
+#'
+#' @export
+plot_found <- function(taxa1, taxa2) {
+    if (colnames(taxa1) != colnames(taxa2))
+        stop("Both taxonomy tables need to have the same column names!")
+
+    metrics <- data.frame()
+    for (cn in colnames(taxa1)) {
+        found <- find_taxa(taxa1, taxa2, level=cn)
+        new <- data.frame(level=cn, found=sum(found)/length(found))
+        metrics <- rbind(metrics, new)
+    }
+
+    pl <- ggplot(metrics, aes(x=level, y=found, col=level)) +
+        geom_bar(stat="identity")
+
+    return(pl)
+}
+
+#' Creates a scatter plot of found versus real quantities.
+#'
+#' @param taxa1 First taxonomy table.
+#' @param taxa2 Second taxonomy table.
+#' @return A scatter plot having the measured quantities on the x-axis and
+#'  true quantities on the y-axis.
+#' @examples
+#'  NULL
+#'
+#' @export
+plot_quants <- function(taxa1, taxa2) {
+    if (colnames(taxa1) != colnames(taxa2))
+        stop("Both taxonomy tables need to have the same column names!")
+
+    n <- ncol(taxa1)
+    x <- data.frame()
+    for (cn in colnames(taxa1)[-n]) {
+        found <- find_taxa(taxa1, taxa2, level=cn)
+        found <- names(found)[found]
+        counts1 <- taxa1[, n]
+        names(counts1) <- apply(taxa1[, -n], 1, paste, collapse=";")
+        counts2 <- taxa2[, n]
+        names(counts2) <- apply(taxa2[, -n], 1, paste, collapse=";")
+        new <- data.frame(level=cn, name=found, counts1=counts1[found],
+            count2=counts2[found])
+        x <- rbind(x, new)
+    }
+
+    pl <- ggplot(x, aes(x=counts1, y=counts2, col=level)) + geom_point() +
+        facet_wrap(~level)
+
+    return(pl)
 }
