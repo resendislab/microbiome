@@ -11,7 +11,7 @@ library(ggplot2)
 
 desc_url <- "https://github.com/caporaso-lab/mockrobiota/raw/master/data/mock-3/dataset-metadata.tsv"
 sample_url <- "https://github.com/caporaso-lab/mockrobiota/raw/master/data/mock-3/sample-metadata.tsv"
-tax_url <- "https://github.com/caporaso-lab/mockrobiota/raw/master//mock-3/source/taxonomy.tsv"
+tax_url <- "https://github.com/caporaso-lab/mockrobiota/raw/master/mock-3/source/taxonomy.tsv"
 
 #download.file(desc_url, "dataset-metadata.tsv")
 #download.file(sample_url, "sample-metadata.tsv")
@@ -31,15 +31,15 @@ bcs <- split_barcodes(reads, index, "split", barcodes)
 fwd <- list.files("split", pattern="\\.R1\\.", full.names=T)
 bwd <- list.files("split", pattern="\\.R2\\.", full.names=T)
 
-ggsave("fwd_quals.png", plotQualityProfile(fwd[[1]]))
-ggsave("bwd_quals.png", plotQualityProfile(bwd[[1]]))
+ggsave("fwd_quals.png", plotQualityProfile(reads[1]))
+ggsave("bwd_quals.png", plotQualityProfile(reads[2]))
 
 dir.create("filtered")
 fwd_filt <- file.path("filtered", basename(fwd))
 bwd_filt <- file.path("filtered", basename(bwd))
 for (i in seq_along(fwd)) {
     fastqPairedFilter(c(fwd[i], bwd[i]), c(fwd_filt[i], bwd_filt[i]),
-        trimLeft=c(10,10), truncLen=c(150, 110), compress=T, verbose=T)
+        truncLen=c(150, 100), compress=T, verbose=T)
 }
 
 derepFs <- derepFastq(fwd_filt, verbose=TRUE)

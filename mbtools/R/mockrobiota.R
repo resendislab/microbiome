@@ -54,7 +54,7 @@ find_taxa <- function(taxa1, taxa2, level="Species") {
     return(found)
 }
 
-#' Creates a barplot of found taxa on each level of the taxonomy.
+#' Calculates what percentage of taxa was found in a reference set.
 #'
 #'
 #' @param taxa1 First taxonomy table.
@@ -64,7 +64,7 @@ find_taxa <- function(taxa1, taxa2, level="Species") {
 #'  NULL
 #'
 #' @export
-plot_found <- function(taxa1, taxa2) {
+taxa_metrics <- function(taxa1, taxa2) {
     if (colnames(taxa1) != colnames(taxa2))
         stop("Both taxonomy tables need to have the same column names!")
 
@@ -75,23 +75,20 @@ plot_found <- function(taxa1, taxa2) {
         metrics <- rbind(metrics, new)
     }
 
-    pl <- ggplot(metrics, aes(x=level, y=found, col=level)) +
-        geom_bar(stat="identity")
-
-    return(pl)
+    return(metrics)
 }
 
-#' Creates a scatter plot of found versus real quantities.
+#' Compares taxa quantification from a measurement to a reference ground truth.
 #'
-#' @param taxa1 First taxonomy table.
-#' @param taxa2 Second taxonomy table.
+#' @param taxa1 Measured taxonomy quantities.
+#' @param taxa2 Reference taxonomy quantities.
 #' @return A scatter plot having the measured quantities on the x-axis and
 #'  true quantities on the y-axis.
 #' @examples
 #'  NULL
 #'
 #' @export
-plot_quants <- function(taxa1, taxa2) {
+taxa_quants <- function(taxa1, taxa2) {
     if (colnames(taxa1) != colnames(taxa2))
         stop("Both taxonomy tables need to have the same column names!")
 
@@ -100,17 +97,14 @@ plot_quants <- function(taxa1, taxa2) {
     for (cn in colnames(taxa1)[-n]) {
         found <- find_taxa(taxa1, taxa2, level=cn)
         found <- names(found)[found]
-        counts1 <- taxa1[, n]
-        names(counts1) <- apply(taxa1[, -n], 1, paste, collapse=";")
-        counts2 <- taxa2[, n]
-        names(counts2) <- apply(taxa2[, -n], 1, paste, collapse=";")
-        new <- data.frame(level=cn, name=found, counts1=counts1[found],
-            count2=counts2[found])
+        measured <- taxa1[, n]
+        names(measured) <- apply(taxa1[, -n], 1, paste, collapse=";")
+        reference <- taxa2[, n]
+        names(reference) <- apply(taxa2[, -n], 1, paste, collapse=";")
+        new <- data.frame(level=cn, name=found, measured=measured[found],
+            reference=reference[found])
         x <- rbind(x, new)
     }
 
-    pl <- ggplot(x, aes(x=counts1, y=counts2, col=level)) + geom_point() +
-        facet_wrap(~level)
-
-    return(pl)
+    return(x)
 }
