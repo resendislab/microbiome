@@ -1,6 +1,6 @@
-## Copyright 2016 Christian Diener <mail[at]cdiener.com>
-##
-## Apache license 2.0. See LICENSE for more information.
+# Copyright 2016 Christian Diener <mail[at]cdiener.com>
+#
+# Apache license 2.0. See LICENSE for more information.
 
 #' Downloads all files from a given FTP directory
 #'
@@ -16,10 +16,11 @@
 #' @export
 #' @importFrom RCurl getURL
 download_ftpdir <- function(url, outdir, quiet=FALSE) {
-    files <- strsplit(getURL(url, dirlistonly=TRUE), "\n")[[1]]
+    files <- strsplit(getURL(url, dirlistonly = TRUE), "\n")[[1]]
     dir.create(outdir)
     sapply(files, function(f)
-        download.file(paste0(url, "/", f), paste0(outdir, "/", f), quiet=quiet))
+        download.file(paste0(url, "/", f), paste0(outdir, "/", f),
+            quiet = quiet))
     return(files)
 }
 
@@ -45,9 +46,9 @@ find_taxa <- function(taxa1, taxa2, level="Species") {
         stop("level must be a valid column name in both tables!")
 
     index <- which(colnames(taxa1) == level)
-    snames <- unique(apply(taxa1[, 1:index], 1, paste, collapse=";"))
+    snames <- unique(apply(taxa1[, 1:index], 1, paste, collapse = ";"))
     snames <- snames[!is.na(snames) & nchar(snames) > 0]
-    snames_ref <- apply(taxa2[, 1:index], 1, paste, collapse=";")
+    snames_ref <- apply(taxa2[, 1:index], 1, paste, collapse = ";")
     found <- snames %in% snames_ref
     names(found) <- snames
 
@@ -70,8 +71,8 @@ taxa_metrics <- function(taxa1, taxa2) {
 
     metrics <- data.frame()
     for (cn in colnames(taxa1)) {
-        found <- find_taxa(taxa1, taxa2, level=cn)
-        new <- data.frame(level=cn, found=sum(found)/length(found))
+        found <- find_taxa(taxa1, taxa2, level = cn)
+        new <- data.frame(level = cn, found = sum(found) / length(found))
         metrics <- rbind(metrics, new)
     }
 
@@ -95,14 +96,14 @@ taxa_quants <- function(taxa1, taxa2) {
     n <- ncol(taxa1)
     x <- data.frame()
     for (cn in colnames(taxa1)[-n]) {
-        found <- find_taxa(taxa1, taxa2, level=cn)
+        found <- find_taxa(taxa1, taxa2, level = cn)
         found <- names(found)[found]
         measured <- taxa1[, n]
-        names(measured) <- apply(taxa1[, -n], 1, paste, collapse=";")
+        names(measured) <- apply(taxa1[, -n], 1, paste, collapse = ";")
         reference <- taxa2[, n]
-        names(reference) <- apply(taxa2[, -n], 1, paste, collapse=";")
-        new <- data.frame(level=cn, name=found, measured=measured[found],
-            reference=reference[found])
+        names(reference) <- apply(taxa2[, -n], 1, paste, collapse = ";")
+        new <- data.frame(level = cn, name = found, measured = measured[found],
+            reference = reference[found])
         x <- rbind(x, new)
     }
 

@@ -1,6 +1,6 @@
-## Copyright 2016 Christian Diener <mail[at]cdiener.com>
-##
-## Apache license 2.0. See LICENSE for more information.
+# Copyright 2016 Christian Diener <mail[at]cdiener.com>
+#
+# Apache license 2.0. See LICENSE for more information.
 
 #' Splits FASTQ files into individual samples.
 #'
@@ -39,23 +39,22 @@ split_barcodes <- function(reads, index, out, ref, n=1e5, max_ed=1) {
         stop("There is only one sample. Barcode filtering is not necessary!")
     ref <- c(ref, reverseComplement(ref))
 
-    istream <- FastqStreamer(index, n=n)
+    istream <- FastqStreamer(index, n = n)
     on.exit(close(istream))
 
-    rstream <- lapply(reads, FastqStreamer, n=n)
+    rstream <- lapply(reads, FastqStreamer, n = n)
 
     if (dir.exists(out)) {
         unlink(file.path(out, "*.fastq.gz"))
     } else dir.create(out)
-    res <- c(unique=0, nomatch=0, multiple=0)
+    res <- c(unique = 0, nomatch = 0, multiple = 0)
     nseq <- 0
 
-    cat("Aligning barcodes:")
     repeat {
         fq <- yield(istream)
         if (length(fq) == 0) break
 
-        ids <- sub("[/\\s].+$", "", id(fq), perl=TRUE)
+        ids <- sub("[/\\s].+$", "", id(fq), perl = TRUE)
 
         hits <- do.call(cbind, srdistance(fq, ref)) <= max_ed
         inds <- apply(hits, 1, function(x) {
@@ -67,7 +66,7 @@ split_barcodes <- function(reads, index, out, ref, n=1e5, max_ed=1) {
 
         for (i in 1:length(rstream)) {
             rfq <- yield(rstream[[i]])
-            rids <- sub("[/\\s].+$", "", id(rfq), perl=TRUE)
+            rids <- sub("[/\\s].+$", "", id(rfq), perl = TRUE)
             if (any(rids != ids)) {
                 sapply(rstream, close)
                 stop("Index file and reads do not match!")
@@ -75,16 +74,14 @@ split_barcodes <- function(reads, index, out, ref, n=1e5, max_ed=1) {
             fn <- basename(reads[i])
 
             for (sid in 1:nref) {
-                writeFastq(rfq[inds == sid], file.path(out, paste0(snames[sid], "_", fn)), "a")
+                writeFastq(rfq[inds == sid], file.path(out,
+                    paste0(snames[sid], "_", fn)), "a")
             }
         }
         nseq <- nseq + length(fq)
         res <- res + c(sum(inds > 0), sum(inds == 0), sum(inds < 0))
-        cat("                                            \r")
-        cat(sprintf("Aligning barcodes: finished %d sequences...", nseq))
     }
     sapply(rstream, close)
-    cat("\n")
 
     return(res)
 }

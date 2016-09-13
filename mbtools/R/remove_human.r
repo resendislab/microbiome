@@ -1,6 +1,6 @@
-## Copyright 2016 Christian Diener <mail[at]cdiener.com>
-##
-## Apache license 2.0. See LICENSE for more information.
+# Copyright 2016 Christian Diener <mail[at]cdiener.com>
+#
+# Apache license 2.0. See LICENSE for more information.
 
 #' Builds index files for human sequence identification
 #'
