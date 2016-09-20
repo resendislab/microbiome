@@ -2,26 +2,13 @@
 #
 # Apache license 2.0. See LICENSE for more information.
 
-#' Downloads all files from a given FTP directory
-#'
-#' This can be used to download all file from a FTP directory.
-#'
-#' @param url URL to the directory.
-#' @param outdir The output directory (will be created).
-#' @param quiet Boolean. Whether the download should happen quietly.
-#' @return A character vector of the downloaded filenames.
-#' @examples
-#'  NULL
-#'
-#' @export
-#' @importFrom RCurl getURL
-download_ftpdir <- function(url, outdir, quiet=FALSE) {
-    files <- strsplit(getURL(url, dirlistonly = TRUE), "\n")[[1]]
-    dir.create(outdir)
-    sapply(files, function(f)
-        download.file(paste0(url, "/", f), paste0(outdir, "/", f),
-            quiet = quiet))
-    return(files)
+taxa_str <- function(taxa, level) {
+    index <- which(colnames(taxa) == level)
+    bad <- apply(taxa[, 1:index, drop = FALSE], 1, function(x)
+        any(is.na(x) | nchar(x) == 0))
+    strs <- apply(taxa[, 1:index, drop = FALSE], 1, paste, collapse = ";")
+    strs[bad] <- NA
+    return(strs)
 }
 
 #' Checks whether taxa from one taxonomy table are contained in another table.
@@ -46,9 +33,9 @@ find_taxa <- function(taxa1, taxa2, level="Species") {
         stop("level must be a valid column name in both tables!")
 
     index <- which(colnames(taxa1) == level)
-    snames <- unique(apply(taxa1[, 1:index], 1, paste, collapse = ";"))
-    snames <- snames[!is.na(snames) & nchar(snames) > 0]
-    snames_ref <- apply(taxa2[, 1:index], 1, paste, collapse = ";")
+    snames <- unique(taxa_str(taxa1, level))
+    snames <- snames[!is.na(snames)]
+    snames_ref <- taxa_str(taxa2, level)
     found <- snames %in% snames_ref
     names(found) <- snames
 
@@ -66,13 +53,14 @@ find_taxa <- function(taxa1, taxa2, level="Species") {
 #'
 #' @export
 taxa_metrics <- function(taxa1, taxa2) {
-    if (colnames(taxa1) != colnames(taxa2))
+    if (any(colnames(taxa1) != colnames(taxa2)))
         stop("Both taxonomy tables need to have the same column names!")
 
     metrics <- data.frame()
     for (cn in colnames(taxa1)) {
         found <- find_taxa(taxa1, taxa2, level = cn)
-        new <- data.frame(level = cn, found = sum(found) / length(found))
+        new <- data.frame(level = cn, found = sum(found) / length(found),
+            n = length(found))
         metrics <- rbind(metrics, new)
     }
 
@@ -83,29 +71,54 @@ taxa_metrics <- function(taxa1, taxa2) {
 #'
 #' @param taxa1 Measured taxonomy quantities.
 #' @param taxa2 Reference taxonomy quantities.
-#' @return A scatter plot having the measured quantities on the x-axis and
-#'  true quantities on the y-axis.
+#' @return A data frame with the following columns:
+#'  \describe{
+#'  \item{level}{The taxonomy level for the entry.}
+#'  \item{name}{The taxonomy.}
+#'  \item{measured}{The measured quantification.}
+#'  \item{measured}{The reference quantification.}
+#' }
 #' @examples
 #'  NULL
 #'
 #' @export
 taxa_quants <- function(taxa1, taxa2) {
-    if (colnames(taxa1) != colnames(taxa2))
+    if (any(colnames(taxa1) != colnames(taxa2)))
         stop("Both taxonomy tables need to have the same column names!")
 
     n <- ncol(taxa1)
     x <- data.frame()
     for (cn in colnames(taxa1)[-n]) {
+        index <- which(colnames(taxa1) == cn)
         found <- find_taxa(taxa1, taxa2, level = cn)
         found <- names(found)[found]
         measured <- taxa1[, n]
-        names(measured) <- apply(taxa1[, -n], 1, paste, collapse = ";")
+        tax_m <- taxa_str(taxa1, cn)
+        measured <- tapply(measured, tax_m, sum, na.rm = TRUE)
         reference <- taxa2[, n]
-        names(reference) <- apply(taxa2[, -n], 1, paste, collapse = ";")
+        tax_r <- taxa_str(taxa2, cn)
+        reference <- tapply(reference, tax_r, sum, na.rm = TRUE)
         new <- data.frame(level = cn, name = found, measured = measured[found],
             reference = reference[found])
         x <- rbind(x, new)
     }
 
     return(x)
+}
+
+#' Creates a plot of measured taxa quantifications vs. reference quantification.
+#'
+#' @param taxa1 Measured taxonomy quantities.
+#' @param taxa2 Reference taxonomy quantities.
+#' @return A ggplot2 plot.
+#' @examples
+#'  NULL
+#'
+#' @export
+mock_plot <- function(taxa1, taxa2) {
+    quants <- taxa_quants(taxa1, taxa2)
+    ggplot(quants, aes(x = reference, y = measured)) +
+        geom_abline(alpha = 0.5) + geom_point(aes(col = level)) +
+        facet_wrap(~ level, scales = "free") + theme_bw() +
+        theme(legend.position = "none")
 }

@@ -6,6 +6,7 @@
 \alias{mbtools-package}
 \title{mbtools.}
 \description{
-mbtools.
+`mbtools` includes several helper functions for analysis and benchmarking
+of microbial community analysis.
 }
 

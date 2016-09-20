@@ -40,3 +40,10 @@ docker run -d -p 8000:8787 cdiener/microbiome
 ```
 
 Now navigate your browser to <your-ip>:8000 (for instance localhost:8000 if you run docker on your machine) and you will be prompted for user credentials (use "rstudio" for user and password). All packages and dependencies are already installed here.
+
+### FAQ
+
+- How do I change the password?
+  Login to the rstudio account with the default credentials (user and password
+  are "rstudio"). Click on the "Tools" in the menu bar and choose "Shell".
+  Type "passwd" and Enter. You will be promted for the old and new password.
