@@ -13,7 +13,7 @@ test_that("taxa can be found and counted", {
     expect_equal(nrow(fi), 3)
 
     fi <- taxa_metrics(taxa, taxa[-1, ])
-    expect_true(any(fi$found < 1))
+    expect_true(all(fi$found <= 1))
     expect_equal(nrow(fi), 3)
 })
 

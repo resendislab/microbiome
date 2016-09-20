@@ -2,6 +2,9 @@
 #
 # Apache license 2.0. See LICENSE for more information.
 
+# So check does not complain :()
+utils::globalVariables(c("reference", "measured", "level"))
+
 taxa_str <- function(taxa, level) {
     index <- which(colnames(taxa) == level)
     bad <- apply(taxa[, 1:index, drop = FALSE], 1, function(x)

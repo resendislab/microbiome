@@ -11,7 +11,8 @@ Imports:
     ShortRead,
     phangorn,
     msa,
-    dada2
+    dada2,
+    ggplot2
 License: Apache License (== 2.0)
 Encoding: UTF-8
 LazyData: true
