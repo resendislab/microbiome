@@ -140,6 +140,7 @@ taxa_metrics <- function(taxa1, taxa2) {
 #'
 #' @param taxa1 Measured taxonomy quantities.
 #' @param taxa2 Reference taxonomy quantities.
+#' @param normalize Whether to normalize taxa counts first.
 #' @return A data frame with the following columns:
 #'  \describe{
 #'  \item{level}{The taxonomy level for the entry.}
