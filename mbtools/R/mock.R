@@ -5,6 +5,72 @@
 # So check does not complain :()
 utils::globalVariables(c("reference", "measured", "level"))
 
+# mockrobiota base address
+mb <- "https://raw.githubusercontent.com/caporaso-lab/mockrobiota/master/data/"
+dl <- c("raw-data-url-forward-read", "raw-data-url-reverse-read",
+        "raw-data-url-index-read")
+
+download_reads <- function(url, folder, quiet) {
+    if (is.na(url)) return(NA)
+    p <- file.path(folder, basename(url))
+    download.file(url, p, quiet = quiet)
+    p
+}
+
+#' Downloads a complete data set from mockrobiota.
+#'
+#' @param name Name of the mockrobiota data set.
+#' @param folder Where to save the data.
+#' @param quiet Whether to show download progress.
+#' @return A list with the following components
+#' \describe{
+#' \item{description}{A description of the data set.}
+#' \item{forward}{Filepath to the forward reads.}
+#' \item{reverse}{Filepath to the reverse reads.}
+#' \item{index}{Filepath to the index file.}
+#' \item{citation}{Reference for the data set.}
+#' \item{fragment}{Which fragment(s) were sequenced.}
+#' \item{equipment}{The used sequencing equipment.}
+#' \item{samples}{A data frame mapping samples to barcodes.}
+#' \item{tax_gg}{The reference taxonomy for green genes.}
+#' \item{tax_silva}{The reference taxonomy for silva.}
+#'}
+#' @examples
+#'  NULL
+#'
+#' @export
+mockrobiota <- function(name, folder, quiet=!interactive()) {
+    mock_info <- sprintf("%s/%s/dataset-metadata.tsv", mb, name)
+    mock_samples <- sprintf("%s/%s/sample-metadata.tsv", mb, name)
+    info <- read.table(mock_info, sep = "\t", header = TRUE)
+    ivec <- as.character(info[, 2])
+    names(ivec) <- as.character(info[, 1])
+
+    dir.create(folder, showWarnings = FALSE)
+
+    downloaded <- vapply(ivec[dl], download_reads, "", folder = folder,
+                         quiet = quiet)
+    samples <- read.table(mock_samples, header = TRUE)
+
+    gg <- sprintf("%s/%s/greengenes/13_8/expected-taxonomy.tsv", mb, name)
+    gg <- read.table(gg, header = TRUE, sep = "\t")
+    silva <- sprintf("%s/%s/silva/119/expected-taxonomy.tsv", mb, name)
+    silva <- read.table(silva, header = TRUE, sep = "\t")
+
+    list(
+        description = ivec["human-readable-description"],
+        forward = downloaded[1],
+        reverse = downloaded[2],
+        index = downloaded[3],
+        citation = ivec["citation"],
+        fragment = ivec["target-subfragment"],
+        equipment = ivec["sequencing-instrument"],
+        samples = samples,
+        tax_gg = gg,
+        tax_silva = silva
+    )
+}
+
 taxa_str <- function(taxa, level) {
     index <- which(colnames(taxa) == level)
     bad <- apply(taxa[, 1:index, drop = FALSE], 1, function(x)
@@ -85,11 +151,19 @@ taxa_metrics <- function(taxa1, taxa2) {
 #'  NULL
 #'
 #' @export
-taxa_quants <- function(taxa1, taxa2) {
+taxa_quants <- function(taxa1, taxa2, normalize = FALSE) {
     if (any(colnames(taxa1) != colnames(taxa2)))
         stop("Both taxonomy tables need to have the same column names!")
 
     n <- ncol(taxa1)
+    taxa1 <- as.data.frame(taxa1)
+    taxa2 <- as.data.frame(taxa2)
+
+    if (normalize) {
+        taxa1[, n] <- taxa1[, n] / sum(taxa1[, n])
+        taxa2[, n] <- taxa2[, n] / sum(taxa2[, n])
+    }
+
     x <- data.frame()
     for (cn in colnames(taxa1)[-n]) {
         index <- which(colnames(taxa1) == cn)
@@ -119,7 +193,7 @@ taxa_quants <- function(taxa1, taxa2) {
 #'
 #' @export
 mock_plot <- function(taxa1, taxa2) {
-    quants <- taxa_quants(taxa1, taxa2)
+    quants <- taxa_quants(taxa1, taxa2, normalize = TRUE)
     ggplot(quants, aes(x = reference, y = measured)) +
         geom_abline(alpha = 0.5) + geom_point(aes(col = level)) +
         facet_wrap(~ level, scales = "free") + theme_bw() +

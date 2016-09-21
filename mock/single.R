@@ -9,27 +9,17 @@ devtools::load_all("../mbtools")
 library(dada2)
 library(ggplot2)
 
-desc_url <- "https://github.com/caporaso-lab/mockrobiota/raw/master/data/mock-3/dataset-metadata.tsv"
-sample_url <- "https://github.com/caporaso-lab/mockrobiota/raw/master/data/mock-3/sample-metadata.tsv"
-tax_url <- "https://github.com/caporaso-lab/mockrobiota/raw/master/mock-3/source/taxonomy.tsv"
+if (!file.exists("mock3.rds")) {
+    mock <- mockrobiota("mock-3", "mock3")
+    saveRDS(mock, "mock3.rds")
+} else mock <- readRDS("mock3.rds")
 
-#download.file(desc_url, "dataset-metadata.tsv")
-#download.file(sample_url, "sample-metadata.tsv")
-#download.file(tax_url, "taxonomy.tsv")
-
-desc <- read.table(desc_url, sep="\t", header=T)
-samples <- read.table(sample_url, sep="\t", header=T, comment.char="")
-data_url <- desc[3, 2]
-
-if (!dir.exists("mock3")) download_ftpdir(data_url, "mock3")
-
-reads <- list.files("mock3", pattern="\\.R\\d\\.", full.names=T)
-index <- list.files("mock3", pattern="\\.I1\\.", full.names=T)
-barcodes <- samples$BarcodeSequence
-names(barcodes) <- gsub(".+\\.", "", samples[,1])
-bcs <- split_barcodes(reads, index, "split", barcodes)
-fwd <- list.files("split", pattern="\\.R1\\.", full.names=T)
-bwd <- list.files("split", pattern="\\.R2\\.", full.names=T)
+reads <- c(mock$forward, mock$reverse)
+barcodes <- mock$samples$BarcodeSequence
+names(barcodes) <- gsub(".+\\.", "", mock$samples[,1])
+bcs <- split_barcodes(reads, mock$index, "split", barcodes)
+fwd <- list.files("split", pattern="forward", full.names=T)
+bwd <- list.files("split", pattern="reverse", full.names=T)
 
 ggsave("fwd_quals.png", plotQualityProfile(reads[1]))
 ggsave("bwd_quals.png", plotQualityProfile(reads[2]))
