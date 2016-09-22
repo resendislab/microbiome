@@ -6,7 +6,7 @@
 #' @importFrom utils packageVersion
 NULL
 
-pkgs <- c("ggplot2", "dada2", "msa", "phangorn", "ShortRead")
+pkgs <- c("ggplot2", "dada2", "phyloseq", "msa", "phangorn", "ShortRead")
 
 silent_lib <- function(...) suppressPackageStartupMessages(library(...))
 

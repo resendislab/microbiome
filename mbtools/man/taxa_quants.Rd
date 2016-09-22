@@ -4,12 +4,14 @@
 \alias{taxa_quants}
 \title{Compares taxa quantification from a measurement to a reference ground truth.}
 \usage{
-taxa_quants(taxa1, taxa2)
+taxa_quants(taxa1, taxa2, normalize = FALSE)
 }
 \arguments{
 \item{taxa1}{Measured taxonomy quantities.}
 
 \item{taxa2}{Reference taxonomy quantities.}
+
+\item{normalize}{Whether to normalize taxa counts first.}
 }
 \value{
 A data frame with the following columns:

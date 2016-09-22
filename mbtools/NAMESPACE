@@ -3,6 +3,7 @@
 export(build_index)
 export(find_taxa)
 export(mock_plot)
+export(mockrobiota)
 export(remove_human)
 export(split_barcodes)
 export(taxa_metrics)
