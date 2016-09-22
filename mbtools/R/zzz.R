@@ -3,7 +3,7 @@
 # Apache license 2.0. See LICENSE for more information.
 
 #' @import ShortRead ggplot2
-#' @importFrom utils packageVersion
+#' @importFrom utils packageVersion download.file read.table
 NULL
 
 pkgs <- c("ggplot2", "dada2", "phyloseq", "msa", "phangorn", "ShortRead")
