@@ -4,20 +4,20 @@
 \alias{remove_human}
 \title{Removes human sequences from a set of reads.}
 \usage{
-remove_human(reads, out, barcode_files = NA, index = "./bmtagger")
+remove_human(reads, index = NA, out, where = "./bmtagger")
 }
 \arguments{
 \item{reads}{A character vector containing the read files in fastq format.}
 
+\item{index}{Additional barcode file that should be filtered as well.}
+
 \item{out}{A folder to which to save the filtered fastq files.}
 
-\item{barcode_files}{Additional barcode file that should be filtered as well.}
-
-\item{index}{Where to find the previously generated index files.}
+\item{where}{Where to find the previously generated index files.}
 }
 \value{
 A numeric vector with two entries. The number of sequences after
- filtering (non-human), and the number of removed sequnces (human).
+ filtering (non-human), and the number of removed sequences (human).
 }
 \description{
 This function uses bmtagger to identify and remove humans sequences. It requires
