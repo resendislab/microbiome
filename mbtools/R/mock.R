@@ -10,6 +10,8 @@ mb <- "https://raw.githubusercontent.com/caporaso-lab/mockrobiota/master/data/"
 dl <- c("raw-data-url-forward-read", "raw-data-url-reverse-read",
         "raw-data-url-index-read")
 
+L <- c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
+
 download_reads <- function(url, folder, quiet) {
     if (is.na(url)) return(NA)
     p <- file.path(folder, basename(url))
@@ -54,8 +56,16 @@ mockrobiota <- function(name, folder, quiet=!interactive()) {
 
     gg <- sprintf("%s/%s/greengenes/13_8/expected-taxonomy.tsv", mb, name)
     gg <- read.table(gg, header = TRUE, sep = "\t")
+    taxa <- as.character(gg[, 1])
+    taxa <- do.call(rbind, strsplit(taxa, ";"))
+    colnames(taxa) <- L[1:ncol(taxa)]
+    gg <- cbind(taxa, gg[, -1])
     silva <- sprintf("%s/%s/silva/119/expected-taxonomy.tsv", mb, name)
     silva <- read.table(silva, header = TRUE, sep = "\t")
+    taxa <- as.character(silva[, 1])
+    taxa <- do.call(rbind, strsplit(taxa, ";"))
+    colnames(taxa) <- L[1:ncol(taxa)]
+    silva <- cbind(taxa, silva[, -1])
 
     list(
         description = ivec["human-readable-description"],

@@ -1,0 +1,233 @@
+---
+title: "Mock community example"
+author: "Christian Diener"
+output:
+    html_document:
+        toc: true
+        toc_float: true
+        theme: paper
+    pdf_document:
+        latex_engine: lualatex
+        toc: true
+        number_sections: true
+---
+
+
+For installtion instructions please see https://github.com/cdiener/microbiome.
+We recommend using the docker image in the cloud or locally as this ensures
+that all requirements are fulfilled in the correct version.
+
+## Loading dependencies
+
+In order to facilitate use of the pipeline we provide the `mbtools` R package
+in this repository which serves two major purposes:
+
+1. It implements additional helper functions for the analysis and benchmarking
+   of microbial community data.
+2. It depends on all additional packages required for analysis and load them
+   upon import.
+
+So loading `mbtools` should be the first step when running the analysis
+
+```{r}
+library(mbtools)
+```
+
+## Getting the mock community data
+
+`mbtools` includes helper functions to obtain benchmark mock data sets from
+the [mockrobiota database](https://peerj.com/preprints/2065/). For instance
+to download the mock-3 data set (relatively small) we can use
+
+```{r}
+if (!file.exists("mock3.rds")) {
+    mock <- mockrobiota("mock-3", "mock3")
+    saveRDS(mock, "mock3.rds")
+} else mock <- readRDS("mock3.rds")
+```
+
+Here `mock` now includes annotations for the data set as a list.
+
+```{r}
+names(mock)
+mock$samples
+```
+
+## Preparing the reads
+
+As we can see we have 3 read files, the forward and backward reads and one
+index file mapping the sample barcodes to the sequences. However, we have 4
+samples: a uniform and staggered community in duplicates each. In order to
+map sequence variants to samples `dada2` expects read files to be separated by
+sample. `mbtools` includes helper functions to obtain this splitting.
+
+```{r}
+reads <- c(mock$forward, mock$reverse)
+barcodes <- mock$samples$BarcodeSequence
+names(barcodes) <- mock$samples[,1]
+bcs <- split_barcodes(reads, mock$index, "split", barcodes)
+fwd <- list.files("split", pattern="forward", full.names=T)
+bwd <- list.files("split", pattern="reverse", full.names=T)
+
+fwd
+```
+
+As we see that now gives us the reads separated by sample. The orginal read
+still include some valid information, particularly they include the read qualities
+across all samples.
+
+```{r}
+plotQualityProfile(reads[1])
+plotQualityProfile(reads[1])
+```
+
+As we can see both qualities detoriate extremely with read lengths. Thus,
+we will now pass trim the reads. From the plots we can see that the forward
+reads have decent quality up to a length of 150 bp whereas the reverse reads
+are acceptable up to 100 bp.
+
+```{r}
+dir.create("filtered")
+fwd_filt <- file.path("filtered", basename(fwd))
+bwd_filt <- file.path("filtered", basename(bwd))
+for (i in seq_along(fwd)) {
+    fastqPairedFilter(c(fwd[i], bwd[i]), c(fwd_filt[i], bwd_filt[i]),
+        truncLen=c(150, 100), compress=T, verbose=T)
+}
+```
+
+We will follow by dereplicating the reads which will yield the unique
+sequences in the samples.
+
+```{r}
+derepFs <- derepFastq(fwd_filt, verbose=TRUE)
+derepRs <- derepFastq(bwd_filt, verbose=TRUE)
+# Name the derep-class objects by the sample names
+names(derepFs) <- names(derepRs) <- names(barcodes)
+```
+
+## Obtaining the sequence variants (sequence OTUs)
+
+With the trimmed and dereplicated reads we can now advance to running the dada2
+algorithm to discover the unqiue sequence variants in our reads. We will do this
+separately for the forward and backward reads.
+
+```{r}
+dadaFs <- dada(derepFs, err=NULL, selfConsist = TRUE)
+dadaRs <- dada(derepRs, err=NULL, selfConsist = TRUE)
+```
+
+This will fit an error model that deconvolutes the original sequence variants
+in the sample. We can investigate how well the error model reproduces our data
+as well.
+
+```{r}
+plotErrors(dadaFs, nominalQ=TRUE)
+plotErrors(dadaRs, nominalQ=TRUE)
+```
+
+We will now quantify the sequence variants for both samples and combine them.
+Normally we would try to actually combine the forward and backwards reads into
+larger reads and quantify those, however our read qualities were so bad in this
+data set that there is no sufficient overlap. Thus, we will treat the forward and
+backward reads independently.
+
+```{r}
+seqtab <- cbind(
+    makeSequenceTable(dadaFs),
+    makeSequenceTable(dadaRs))
+```
+
+Finally, we will also remove bimeras from the data set.
+
+```{r}
+seqtab_nochim <- removeBimeraDenovo(seqtab, verbose=TRUE)
+```
+
+## Taxonomy assignment and validation
+
+In order to classify taxonomies for the individual sequence variants we will
+use the RDP algorithm with the green genes reference sequences. If you do not
+use the docker image this data set has to be downloaded first [from here](https://www.dropbox.com/sh/mfcivbudmc21cqt/AAB1l-AUM5uKvjrR33ct-cTXa).
+
+```{r}
+file.exists("gg_13_8_train_set_97.fa.gz")
+```
+
+Axonomies can now be assigned by
+
+```{r}
+taxa <- assignTaxonomy(seqtab_nochim, "gg_13_8_train_set_97.fa.gz")
+colnames(taxa) <- c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
+head(unname(taxa))
+```
+
+This can be combined with quantifications using the phyloseq package.
+
+```{r}
+ps <- phyloseq(otu_table(seqtab_nochim, taxa_are_rows=FALSE),
+               tax_table(taxa))
+```
+
+We can create a table quantifying the taxa across samples with
+
+```{r}
+taxa <- cbind(as.data.frame(tax_table(ps)), t(otu_table(ps)))
+rownames(taxa) <- NULL
+
+head(taxa)
+```
+
+We can now compare this table to our reference table from mockrobiota. We will
+start by quantifying how many of the real taxa were found in our taxonomy
+assignment.
+
+```{r}
+taxa_metrics(taxa[, 1:7], mock$tax_gg[, 1:7])
+```
+
+As we can see we are pretty good in identifying the taxa in our samples.
+However, how do we perform in terms of taxa quantification? We will
+start by stratifying across the samples:
+
+```{r}
+res <- NULL
+
+# ierate over samples
+for (i in 8:11) {
+    tq <- taxa_quants(taxa[, c(1:7, i)], mock$tax_gg[, c(1:7, i)], normalize=T)
+    res <- rbind(res, cbind(tq, sample=colnames(taxa)[i]))
+}
+
+head(res)
+```
+
+`taxa_quants` already qunatifies across a possible levels of taxonomy. So we
+can plot the performance stratified by sample with
+
+```{r}
+ggplot(res, aes(x=reference, y=measured, col=level)) +
+    geom_abline(alpha=0.5) +
+    geom_point() +
+    facet_wrap(~ sample)
+```
+
+Additionally, we can also combine all samples and rather stratify by taxonomy
+level.
+
+```{r}
+ggplot(res, aes(x=reference, y=measured, col=sample)) +
+    geom_abline(alpha=0.5) +
+    geom_point() +
+    facet_wrap(~ level, scale="free")
+```
+
+This looks pretty ok with larger variations on the species level, which is to
+be expected. We can quantify the performance by a correlation test.
+
+```{r}
+cor.test(res$measured, res$reference)
+```
+
+So we get a correlation of about 0.85 which is okay for the low number of reads
+we used here.
