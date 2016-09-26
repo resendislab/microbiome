@@ -1,4 +1,4 @@
-context("Mock diagnostics")
+context("mock diagnostics")
 
 # A small mock table
 taxa <- data.frame(

@@ -2,8 +2,8 @@
 #
 # Apache license 2.0. See LICENSE for more information.
 
-HS_GENOME <- "ftp://ftp.ensembl.org/pub/current_fasta/homo_sapiens/
-dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz"
+HS_GENOME <- paste0("ftp://ftp.ensembl.org/pub/current_fasta/homo_sapiens/",
+                    "dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz")
 
 #' Builds index files for human sequence identification
 #'
@@ -17,11 +17,14 @@ dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz"
 #'
 #' @export
 build_index <- function(where="./bmtagger", genome_file=NA) {
+    dir.create(where, showWarnings = FALSE)
+
     if (is.na(genome_file)) {
         loc <- file.path(where, "hg38.fa.gz")
         cat("No genome file given, downloading hg38...\n")
         download.file(HS_GENOME, loc)
-        genome_file <- loc
+        cat("Extracting hg38...\n")
+        genome_file <- gunzip(loc)
     }
 
     cat("Building reference bitmask...\n")
@@ -55,27 +58,36 @@ build_index <- function(where="./bmtagger", genome_file=NA) {
 remove_human <- function(reads, index=NA, out, where="./bmtagger") {
     paired <- length(reads) == 2 & !any(is.na(reads))
 
+    if (paired) {
+        reads <- vapply(reads, gunzip, "", remove = FALSE, skip = TRUE)
+    } else reads <- gunzip(reads[1], remove = FALSE, skip = TRUE)
+
+    if (!is.na(index)) index <- gunzip(index, remove = FALSE, skip = TRUE)
+
     cat("Finding human sequences...")
     if (!paired) {
         system2("bmtagger.sh", c("-b", file.path(where, "ref.bitmask"), "-x",
                                  file.path(where, "ref.srprism"), "-T",
-                                 file.path(where, "tmp"), "-q", "1", "-1", "-o",
+                                 file.path(where), "-q", "1", "-1", "-o",
                                  file.path(where, "human.txt")))
     } else {
         system2("bmtagger.sh", c("-b", file.path(where, "ref.bitmask"), "-x",
                                  file.path(where, "ref.srprism"), "-T",
-                                 file.path(where, "tmp"), "-q", "1", "-1",
+                                 file.path(where), "-q", "1", "-1",
                                  reads[1], "-2", reads[2], "-o",
                                  file.path(where, "human.txt")))
     }
 
 
     human_ids <- read.table(file.path(where, "human.txt"))[, 1]
-    new_files <- file.path(out, basename(reads))
+    human_ids <- as.character(human_ids)
+    new_files <- file.path(out, paste0(basename(reads), ".gz"))
+    dir.create(out, showWarnings = FALSE)
 
     streams <- list(f = FastqStreamer(reads[1]))
     if (!is.na(index)) {
         streams$i <- FastqStreamer(index)
+        new_files[3] <- file.path(out, paste0(basename(index), ".gz"))
     }
     if (paired) {
         streams$r <- FastqStreamer(reads[2])
@@ -86,7 +98,8 @@ remove_human <- function(reads, index=NA, out, where="./bmtagger") {
         repeat {
             reads <- yield(streams[[i]])
             if (length(reads) == 0) break
-            rem <- !(id(reads) %in% human_ids)
+            ids <- sub("/\\d+$", "", as.character(id(reads)))
+            rem <- !(ids %in% human_ids)
             writeFastq(reads[rem], new_files[i])
             n <- n + length(reads[rem])
         }

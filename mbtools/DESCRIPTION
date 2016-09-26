@@ -1,6 +1,6 @@
 Package: mbtools
 Title: Provides helper functions for microbiome preprocessing and analysis
-Version: 0.3.0
+Version: 0.4.1
 Authors@R: person("First", "Last", email = "mail@cdiener.com", role = c("aut", "cre"))
 Description: Provides helper functions for microbiome preprocessing and
     analysis.
@@ -13,7 +13,9 @@ Imports:
     phangorn,
     msa,
     dada2,
-    ggplot2
+    ggplot2,
+    stringr,
+    R.utils
 License: Apache License (== 2.0)
 Encoding: UTF-8
 LazyData: true

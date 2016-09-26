@@ -2,10 +2,9 @@ context("H. sapiens sequence removal")
 
 test_that("bmtagger index files can be created", {
     with_mock(
-        download.file = function(...) print("download"),
         system2 = function(...) print("system2"),
-        expect_output(build_index(), "download"),
-        expect_output(build_index(genome_file = "mock.fa"), "system2")
+        expect_output(build_index(where = tempdir(),
+                      genome_file = "mock.fa"), "system2")
     )
 })
 
@@ -17,16 +16,16 @@ test_that("sequences can be removed", {
     quals <- replicate(100, paste(rep("@", 100), collapse = ""))
     sr <- ShortReadQ(sread = DNAStringSet(seqs),
                      quality = BStringSet(quals),
-                     id = BStringSet(1:100))
+                     id = BStringSet(paste0("S", 1:100)))
     old_files <- list.files(d, "fastq", recursive = TRUE, full.names = TRUE)
     file.remove(old_files)
-    writeFastq(sr, file.path(d, "f.fastq"))
-    writeFastq(sr, file.path(d, "r.fastq"))
-    writeFastq(sr, file.path(d, "i.fastq"))
+    writeFastq(sr, file.path(d, "f.fastq.gz"))
+    writeFastq(sr, file.path(d, "r.fastq.gz"))
+    writeFastq(sr, file.path(d, "i.fastq.gz"))
 
-    reads <- file.path(d, c("f.fastq", "r.fastq"))
-    index <- file.path(d, "i.fastq")
-    write("1", file = file.path(d, "human.txt"))
+    reads <- file.path(d, c("f.fastq.gz", "r.fastq.gz"))
+    index <- file.path(d, "i.fastq.gz")
+    write("S1", file = file.path(d, "human.txt"))
     dir.create(file.path(d, "nh"), showWarnings = FALSE)
 
     with_mock(system2 = function(...) print("system2"),
