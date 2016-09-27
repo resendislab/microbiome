@@ -10,6 +10,8 @@ This repo contains the standardized analysis pipeline for 16S and metagenome dat
 - Different pipelines are managed via branches. The master branch points to the default pipeline.
 - The project itself is managed in the [Trello Board](https://trello.com/b/rHtrpyiz/microbiome)
 
+For an example analyzing a mock community see https://cdiener.github.io/microbiome.
+
 ## Installation
 
 If you want to perform Human sequence removal you will need [bmtagger](ftp://ftp.ncbi.nlm.nih.gov/pub/agarwala/bmtagger/) installed. The tools are bundled in the `mbtools` R package which also depends on all additional packages you need to run
