@@ -4,12 +4,13 @@
 \alias{taxa_quants}
 \title{Compares taxa quantification from a measurement to a reference ground truth.}
 \usage{
-taxa_quants(taxa1, taxa2, normalize = FALSE)
+taxa_quants(ps, ref, normalize = FALSE)
 }
 \arguments{
-\item{taxa1}{Measured taxonomy quantities.}
+\item{ps}{A phyloseq object describing the measurements}
 
-\item{taxa2}{Reference taxonomy quantities.}
+\item{ref}{A phyloseq object describing the reference set. Can be obtained
+from \link{\code{mockrobiota}}.}
 
 \item{normalize}{Whether to normalize taxa counts first.}
 }
@@ -18,12 +19,14 @@ A data frame with the following columns:
  \describe{
  \item{level}{The taxonomy level for the entry.}
  \item{name}{The taxonomy.}
+ \item{sample}{The sample name for the quantification.}
  \item{measured}{The measured quantification.}
- \item{measured}{The reference quantification.}
+ \item{reference}{The reference quantification.}
 }
 }
 \description{
-Compares taxa quantification from a measurement to a reference ground truth.
+Note that both arguments must be phyloseq objects from the
+phyloseq package.
 }
 \examples{
  NULL

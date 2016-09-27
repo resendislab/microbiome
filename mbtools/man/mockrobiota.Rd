@@ -24,8 +24,8 @@ A list with the following components
 \item{fragment}{Which fragment(s) were sequenced.}
 \item{equipment}{The used sequencing equipment.}
 \item{samples}{A data frame mapping samples to barcodes.}
-\item{tax_gg}{The reference taxonomy for green genes.}
-\item{tax_silva}{The reference taxonomy for silva.}
+\item{ps_gg}{The reference phyloseq object using the green genes taxonomy.}
+\item{ps_silva}{The reference phyloseq object using the silva taxonomy.}
 }
 }
 \description{

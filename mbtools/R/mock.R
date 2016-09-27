@@ -34,8 +34,8 @@ download_reads <- function(url, folder, quiet) {
 #' \item{fragment}{Which fragment(s) were sequenced.}
 #' \item{equipment}{The used sequencing equipment.}
 #' \item{samples}{A data frame mapping samples to barcodes.}
-#' \item{tax_gg}{The reference taxonomy for green genes.}
-#' \item{tax_silva}{The reference taxonomy for silva.}
+#' \item{ps_gg}{The reference phyloseq object using the green genes taxonomy.}
+#' \item{ps_silva}{The reference phyloseq object using the silva taxonomy.}
 #'}
 #' @examples
 #'  NULL
@@ -53,19 +53,24 @@ mockrobiota <- function(name, folder, quiet=!interactive()) {
     downloaded <- vapply(ivec[dl], download_reads, "", folder = folder,
                          quiet = quiet)
     samples <- read.table(mock_samples, header = TRUE)
+    rownames(samples) <- samples[, 1]
 
     gg <- sprintf("%s/%s/greengenes/13_8/expected-taxonomy.tsv", mb, name)
     gg <- read.table(gg, header = TRUE, sep = "\t")
     taxa <- as.character(gg[, 1])
     taxa <- do.call(rbind, strsplit(taxa, ";"))
     colnames(taxa) <- L[1:ncol(taxa)]
-    gg <- cbind(taxa, gg[, -1])
+    gg <- phyloseq(tax_table(as.matrix(taxa)),
+                   otu_table(gg[, -1], taxa_are_rows = TRUE),
+                   sample_data(samples))
     silva <- sprintf("%s/%s/silva/119/expected-taxonomy.tsv", mb, name)
     silva <- read.table(silva, header = TRUE, sep = "\t")
     taxa <- as.character(silva[, 1])
     taxa <- do.call(rbind, strsplit(taxa, ";"))
     colnames(taxa) <- L[1:ncol(taxa)]
-    silva <- cbind(taxa, silva[, -1])
+    silva <- phyloseq(tax_table(as.matrix(taxa)),
+                      otu_table(silva[, -1], taxa_are_rows = TRUE),
+                      sample_data(samples))
 
     list(
         description = ivec["human-readable-description"],
@@ -76,8 +81,8 @@ mockrobiota <- function(name, folder, quiet=!interactive()) {
         fragment = ivec["target-subfragment"],
         equipment = ivec["sequencing-instrument"],
         samples = samples,
-        tax_gg = gg,
-        tax_silva = silva
+        ps_gg = gg,
+        ps_silva = silva
     )
 }
 
@@ -123,21 +128,24 @@ find_taxa <- function(taxa1, taxa2, level="Species") {
 
 #' Calculates what percentage of taxa was found in a reference set.
 #'
+#' Note that both arguments must of class "taxonomyTable" from the
+#' phyloseq package which can be obtained with the \code{tax_table}
+#' method.
 #'
-#' @param taxa1 First taxonomy table.
-#' @param taxa2 Second taxonomy table.
-#' @return A bar plot denoting the percentage of correctly identified taxa.
+#' @param tax_table Measured taxonomy table.
+#' @param ref Reference taxonomy table.
+#' @return A data frame denoting the fraction of found taxa for each level.
 #' @examples
 #'  NULL
 #'
 #' @export
-taxa_metrics <- function(taxa1, taxa2) {
-    if (any(colnames(taxa1) != colnames(taxa2)))
+taxa_metrics <- function(tax_table, ref) {
+    if (any(colnames(tax_table) != colnames(ref)))
         stop("Both taxonomy tables need to have the same column names!")
 
     metrics <- data.frame()
-    for (cn in colnames(taxa1)) {
-        found <- find_taxa(taxa1, taxa2, level = cn)
+    for (cn in colnames(tax_table)) {
+        found <- find_taxa(ref, tax_table, level = cn)
         new <- data.frame(level = cn, found = sum(found) / length(found),
             n = length(found))
         metrics <- rbind(metrics, new)
@@ -148,65 +156,87 @@ taxa_metrics <- function(taxa1, taxa2) {
 
 #' Compares taxa quantification from a measurement to a reference ground truth.
 #'
-#' @param taxa1 Measured taxonomy quantities.
-#' @param taxa2 Reference taxonomy quantities.
+#' Note that both arguments must be phyloseq objects from the
+#' phyloseq package.
+#'
+#' @param ps A phyloseq object describing the measurements
+#' @param ref A phyloseq object describing the reference set. Can be obtained
+#'  from \link{\code{mockrobiota}}.
 #' @param normalize Whether to normalize taxa counts first.
 #' @return A data frame with the following columns:
 #'  \describe{
 #'  \item{level}{The taxonomy level for the entry.}
 #'  \item{name}{The taxonomy.}
+#'  \item{sample}{The sample name for the quantification.}
 #'  \item{measured}{The measured quantification.}
-#'  \item{measured}{The reference quantification.}
+#'  \item{reference}{The reference quantification.}
 #' }
 #' @examples
 #'  NULL
 #'
 #' @export
-taxa_quants <- function(taxa1, taxa2, normalize = FALSE) {
+taxa_quants <- function(ps, ref, normalize = FALSE) {
+    taxa1 <- tax_table(ps)
+    taxa2 <- tax_table(ref)
+    otu1 <- otu_table(ps)
+    otu2 <- otu_table(ref)
+    if (taxa_are_rows(ps)) otu1 <- t(otu1)
+    if (taxa_are_rows(ref)) otu2 <- t(otu2)
+
+    n <- ncol(taxa1)
+    ns <- nrow(otu1)
+
+
     if (any(colnames(taxa1) != colnames(taxa2)))
         stop("Both taxonomy tables need to have the same column names!")
 
-    n <- ncol(taxa1)
-    taxa1 <- as.data.frame(taxa1)
-    taxa2 <- as.data.frame(taxa2)
-
-    if (normalize) {
-        taxa1[, n] <- taxa1[, n] / sum(taxa1[, n])
-        taxa2[, n] <- taxa2[, n] / sum(taxa2[, n])
-    }
+    if (any(rownames(otu1) != rownames(otu2)))
+        stop("Both phyloseq objects need to have the same samples!")
 
     x <- data.frame()
-    for (cn in colnames(taxa1)[-n]) {
-        index <- which(colnames(taxa1) == cn)
+    for (cn in colnames(taxa1)) {
+        tax_m <- taxa_str(taxa1, cn)
+        tax_r <- taxa_str(taxa2, cn)
         found <- find_taxa(taxa1, taxa2, level = cn)
         found <- names(found)[found]
-        measured <- taxa1[, n]
-        tax_m <- taxa_str(taxa1, cn)
-        measured <- tapply(measured, tax_m, sum, na.rm = TRUE)
-        reference <- taxa2[, n]
-        tax_r <- taxa_str(taxa2, cn)
-        reference <- tapply(reference, tax_r, sum, na.rm = TRUE)
-        new <- data.frame(level = cn, name = found, measured = measured[found],
-            reference = reference[found])
-        x <- rbind(x, new)
+        for (i in 1:ns) {
+            measured <- as.numeric(otu1[i, ])
+            reference <- as.numeric(otu2[i, ])
+            if (normalize) {
+                measured <- measured / sum(measured)
+                reference <- reference / sum(reference)
+            }
+            measured <- tapply(measured, tax_m, sum, na.rm = TRUE)
+            reference <- tapply(reference, tax_r, sum, na.rm = TRUE)
+            new <- data.frame(level = cn, name = found,
+                              sample = sample_names(ps)[i],
+                              measured = measured[found],
+                              reference = reference[found])
+            x <- rbind(x, new)
+        }
     }
+    rownames(x) <- NULL
 
     return(x)
 }
 
 #' Creates a plot of measured taxa quantifications vs. reference quantification.
 #'
-#' @param taxa1 Measured taxonomy quantities.
-#' @param taxa2 Reference taxonomy quantities.
+#' Note that both arguments must be phyloseq objects from the
+#' phyloseq package.
+#'
+#' @param ps A phyloseq object describing the measurements
+#' @param ref A phyloseq object describing the reference set. Can be obtained
+#'  from \link{\code{mockrobiota}}.
 #' @return A ggplot2 plot.
 #' @examples
 #'  NULL
 #'
 #' @export
-mock_plot <- function(taxa1, taxa2) {
-    quants <- taxa_quants(taxa1, taxa2, normalize = TRUE)
-    ggplot(quants, aes(x = reference, y = measured)) +
-        geom_abline(alpha = 0.5) + geom_point(aes(col = level)) +
-        facet_wrap(~ level, scales = "free") + theme_bw() +
-        theme(legend.position = "none")
+mock_plot <- function(ps, ref) {
+    quants <- taxa_quants(ps, ref, normalize = TRUE)
+    ggplot(quants, aes(x = reference, y = measured, col = level)) +
+        geom_abline(alpha = 0.5) +
+        geom_smooth(aes(group = 1), method = "lm", lty = "dashed") +
+        geom_point(aes(col = level)) + facet_wrap(~ samples) + theme_bw()
 }

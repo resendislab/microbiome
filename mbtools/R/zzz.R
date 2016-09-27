@@ -2,7 +2,7 @@
 #
 # Apache license 2.0. See LICENSE for more information.
 
-#' @import ShortRead ggplot2
+#' @import ShortRead ggplot2 phyloseq
 #' @importFrom utils packageVersion download.file read.table
 #' @importFrom stringr str_match
 #' @importFrom Biostrings BStringSet

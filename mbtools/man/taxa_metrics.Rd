@@ -4,18 +4,20 @@
 \alias{taxa_metrics}
 \title{Calculates what percentage of taxa was found in a reference set.}
 \usage{
-taxa_metrics(taxa1, taxa2)
+taxa_metrics(tax_table, ref)
 }
 \arguments{
-\item{taxa1}{First taxonomy table.}
+\item{tax_table}{Measured taxonomy table.}
 
-\item{taxa2}{Second taxonomy table.}
+\item{ref}{Reference taxonomy table.}
 }
 \value{
-A bar plot denoting the percentage of correctly identified taxa.
+A data frame denoting the fraction of found taxa for each level.
 }
 \description{
-Calculates what percentage of taxa was found in a reference set.
+Note that both arguments must of class "taxonomyTable" from the
+phyloseq package which can be obtained with the \code{tax_table}
+method.
 }
 \examples{
  NULL

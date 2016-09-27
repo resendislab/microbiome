@@ -78,11 +78,11 @@ across all samples.
 
 ```{r}
 plotQualityProfile(reads[1])
-plotQualityProfile(reads[1])
+plotQualityProfile(reads[2])
 ```
 
 As we can see both qualities detoriate extremely with read lengths. Thus,
-we will now pass trim the reads. From the plots we can see that the forward
+we will have to trim the reads. From the plots we can see that the forward
 reads have decent quality up to a length of 150 bp whereas the reverse reads
 are acceptable up to 100 bp.
 
@@ -138,7 +138,8 @@ seqtab <- cbind(
     makeSequenceTable(dadaRs))
 ```
 
-Finally, we will also remove bimeras from the data set.
+Finally, we will also remove bimeras (reads that are combinations of two other
+reads) from the data set.
 
 ```{r}
 seqtab_nochim <- removeBimeraDenovo(seqtab, verbose=TRUE)
@@ -169,56 +170,45 @@ ps <- phyloseq(otu_table(seqtab_nochim, taxa_are_rows=FALSE),
                tax_table(taxa))
 ```
 
-We can create a table quantifying the taxa across samples with
-
-```{r}
-taxa <- cbind(as.data.frame(tax_table(ps)), t(otu_table(ps)))
-rownames(taxa) <- NULL
-
-head(taxa)
-```
-
 We can now compare this table to our reference table from mockrobiota. We will
 start by quantifying how many of the real taxa were found in our taxonomy
 assignment.
 
 ```{r}
-taxa_metrics(taxa[, 1:7], mock$tax_gg[, 1:7])
+taxa_metrics(tax_table(ps), tax_table(mock$ps_gg))
 ```
 
 As we can see we are pretty good in identifying the taxa in our samples.
-However, how do we perform in terms of taxa quantification? We will
+However, how do we perform in terms of taxa quantities? We will
 start by stratifying across the samples:
 
 ```{r}
-res <- NULL
-
-# ierate over samples
-for (i in 8:11) {
-    tq <- taxa_quants(taxa[, c(1:7, i)], mock$tax_gg[, c(1:7, i)], normalize=T)
-    res <- rbind(res, cbind(tq, sample=colnames(taxa)[i]))
-}
-
-head(res)
+tq <- taxa_quants(ps, mock$ps_gg, normalize = TRUE)
+head(tq)
 ```
 
-`taxa_quants` already qunatifies across a possible levels of taxonomy. So we
+`taxa_quants` already quantifies across a possible levels of taxonomy. So we
 can plot the performance stratified by sample with
 
 ```{r}
-ggplot(res, aes(x=reference, y=measured, col=level)) +
+ggplot(tq, aes(x=reference, y=measured, col=level)) +
     geom_abline(alpha=0.5) +
+    geom_smooth(aes(group=1), method="lm", lty="dashed") +
     geom_point() +
     facet_wrap(~ sample)
 ```
+
+This plot is so common that it is also implemented in `mbtools` as `mock_plot`.
 
 Additionally, we can also combine all samples and rather stratify by taxonomy
 level.
 
 ```{r}
-ggplot(res, aes(x=reference, y=measured, col=sample)) +
+ggplot(tq, aes(x=reference, y=measured, col=sample)) +
     geom_abline(alpha=0.5) +
+    geom_smooth(aes(group=1), method="lm", lty="dashed") +
     geom_point() +
+    theme(legend.position="bottom") +
     facet_wrap(~ level, scale="free")
 ```
 
@@ -226,8 +216,8 @@ This looks pretty ok with larger variations on the species level, which is to
 be expected. We can quantify the performance by a correlation test.
 
 ```{r}
-cor.test(res$measured, res$reference)
+cor.test(tq$measured, tq$reference)
 ```
 
-So we get a correlation of about 0.85 which is okay for the low number of reads
+So we get a correlation of about 0.85 which is okay for the bad quality reads
 we used here.

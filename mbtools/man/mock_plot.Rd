@@ -4,18 +4,20 @@
 \alias{mock_plot}
 \title{Creates a plot of measured taxa quantifications vs. reference quantification.}
 \usage{
-mock_plot(taxa1, taxa2)
+mock_plot(ps, ref)
 }
 \arguments{
-\item{taxa1}{Measured taxonomy quantities.}
+\item{ps}{A phyloseq object describing the measurements}
 
-\item{taxa2}{Reference taxonomy quantities.}
+\item{ref}{A phyloseq object describing the reference set. Can be obtained
+from \link{\code{mockrobiota}}.}
 }
 \value{
 A ggplot2 plot.
 }
 \description{
-Creates a plot of measured taxa quantifications vs. reference quantification.
+Note that both arguments must be phyloseq objects from the
+phyloseq package.
 }
 \examples{
  NULL
