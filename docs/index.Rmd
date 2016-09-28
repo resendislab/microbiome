@@ -1,16 +1,11 @@
+---
+title: "Microbiome pipeline"
+---
+
 [![wercker status](https://app.wercker.com/status/ef9cd211a697b9ae558269dab4ee619e/s "wercker status")](https://app.wercker.com/project/bykey/ef9cd211a697b9ae558269dab4ee619e)
 [![codecov](https://codecov.io/gh/cdiener/microbiome/branch/master/graph/badge.svg)](https://codecov.io/gh/cdiener/microbiome)
 [![Docker Pulls](https://img.shields.io/docker/pulls/cdiener/microbiome.svg?maxAge=2592000)](https://hub.docker.com/r/cdiener/microbiome/)
 
-# Microbiome project pipeline
-
-This repo contains the standardized analysis pipeline for 16S and metagenome data. It serves as a testing ground for what will be required to analyze around 500 samples.
-
-- For suggestions, open questions and bugs please use the [issue tracker](https://github.com/cdiener/microbiome/issues).
-- Different pipelines are managed via branches. The master branch points to the default pipeline.
-- The project itself is managed in the [Trello Board](https://trello.com/b/rHtrpyiz/microbiome)
-
-For an examples analyzing a mock community see https://cdiener.github.io/microbiome.
 
 ## Installation
 

@@ -1,0 +1,28 @@
+name: "Microbiome pipeline"
+output_dir: "."
+navbar:
+    title: "mbtools"
+    left:
+        - text: "Home"
+          href: index.html
+        - text: "Examples"
+          menu:
+              - text: "Mock example"
+                href: mock_example.html
+        - text: "About"
+          href: about.html
+    right:
+        - icon: fa-github fa-lg
+          href: https://github.com/cdiener/microbiome
+        - icon: fa-question fa-lg
+          href: https://github.com/cdiener/microbiome/issues
+        - icon: fa-cloud fa-lg
+          href: https://hub.docker.com/r/cdiener/microbiome/
+
+output:
+    html_document:
+        theme: flatly
+        highlight: textmate
+        toc_depth: 3
+        toc_float:
+            collapsed: false

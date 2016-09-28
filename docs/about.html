@@ -11,7 +11,7 @@
 
 
 
-<title>Microbiome pipeline</title>
+<title>About</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -224,33 +224,61 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Microbiome pipeline</h1>
+<h1 class="title toc-ignore">About</h1>
 
 </div>
 
 
-<p><a href="https://app.wercker.com/project/bykey/ef9cd211a697b9ae558269dab4ee619e"><img src="https://app.wercker.com/status/ef9cd211a697b9ae558269dab4ee619e/s" title="wercker status" alt="wercker status" /></a> <a href="https://codecov.io/gh/cdiener/microbiome"><img src="https://codecov.io/gh/cdiener/microbiome/branch/master/graph/badge.svg" alt="codecov" /></a> <a href="https://hub.docker.com/r/cdiener/microbiome/"><img src="https://img.shields.io/docker/pulls/cdiener/microbiome.svg?maxAge=2592000" alt="Docker Pulls" /></a></p>
-<div id="installation" class="section level2">
-<h2>Installation</h2>
-<p>If you want to perform Human sequence removal you will need <a href="ftp://ftp.ncbi.nlm.nih.gov/pub/agarwala/bmtagger/">bmtagger</a> installed. The tools are bundled in the <code>mbtools</code> R package which also depends on all additional packages you need to run the analyses. You will need to <a href="https://www.bioconductor.org/install/">install bioconductor first</a> followed by running</p>
-<pre class="R"><code>install.packages(&#39;devtools&#39;)
-devtools::install_github(&#39;cdiener/microbiome/mbtools&#39;)</code></pre>
-<p>in R.</p>
-<p>Alternatively you can use the Docker image which is built and kept up to date automatically by watching this repo. For this you will require a <a href="https://www.docker.com/products/docker-toolbox">local installation</a> with Docker or a cloud instance which can run docker (for instance CoreOS VMs on AWS or Google Cloud).</p>
-</div>
-<div id="using-the-docker-image" class="section level2">
-<h2>Using the docker image</h2>
-<p>First get the image with</p>
-<pre class="bash"><code>docker pull cdiener/microbiome</code></pre>
-<p>You can now start a Rstudio instance at port 8000 using</p>
-<pre><code>docker run -d -p 8000:8787 cdiener/microbiome</code></pre>
-<p>Now navigate your browser to <your-ip>:8000 (for instance localhost:8000 if you run docker on your machine) and you will be prompted for user credentials (use “rstudio” for user and password). All packages and dependencies are already installed here.</p>
-<div id="faq" class="section level3">
-<h3>FAQ</h3>
-<ul>
-<li>How do I change the password? Login to the rstudio account with the default credentials (user and password are “rstudio”). Click on the “Tools” in the menu bar and choose “Shell”. Type “passwd” and Enter. You will be promted for the old and new password.</li>
-</ul>
-</div>
+<div id="r-session-info" class="section level2">
+<h2>R session info</h2>
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>## R version 3.3.1 (2016-06-21)
+## Platform: x86_64-pc-linux-gnu (64-bit)
+## Running under: Debian GNU/Linux 8 (jessie)
+## 
+## locale:
+##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+##  [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+##  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+##  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+##  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+## [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+## 
+## attached base packages:
+## [1] stats4    parallel  stats     graphics  grDevices utils     datasets 
+## [8] methods   base     
+## 
+## other attached packages:
+##  [1] ShortRead_1.30.0           GenomicAlignments_1.8.4   
+##  [3] SummarizedExperiment_1.2.3 Biobase_2.32.0            
+##  [5] Rsamtools_1.24.0           GenomicRanges_1.24.3      
+##  [7] GenomeInfoDb_1.8.7         BiocParallel_1.6.6        
+##  [9] phyloseq_1.16.2            phangorn_2.0.4            
+## [11] ape_3.5                    msa_1.4.5                 
+## [13] Biostrings_2.40.2          XVector_0.12.1            
+## [15] IRanges_2.6.1              S4Vectors_0.10.3          
+## [17] BiocGenerics_0.18.0        ggplot2_2.1.0             
+## [19] dada2_1.1.6                Rcpp_0.12.7               
+## [21] mbtools_0.5.0             
+## 
+## loaded via a namespace (and not attached):
+##  [1] reshape2_1.4.1      splines_3.3.1       lattice_0.20-33    
+##  [4] rhdf5_2.16.0        colorspace_1.2-6    htmltools_0.3.5    
+##  [7] yaml_2.1.13         mgcv_1.8-12         chron_2.3-47       
+## [10] survival_2.39-4     R.oo_1.20.0         R.utils_2.4.0      
+## [13] RColorBrewer_1.1-2  foreach_1.4.3       plyr_1.8.4         
+## [16] stringr_1.1.0       zlibbioc_1.18.0     munsell_0.4.3      
+## [19] gtable_0.2.0        hwriter_1.3.2       R.methodsS3_1.7.1  
+## [22] codetools_0.2-14    evaluate_0.9        labeling_0.3       
+## [25] latticeExtra_0.6-28 knitr_1.14          permute_0.9-4      
+## [28] biomformat_1.0.2    scales_0.4.0        vegan_2.4-1        
+## [31] RcppParallel_4.3.20 jsonlite_1.1        fastmatch_1.0-4    
+## [34] digest_0.6.10       stringi_1.1.1       grid_3.3.1         
+## [37] ade4_1.7-4          quadprog_1.5-5      tools_3.3.1        
+## [40] bitops_1.0-6        magrittr_1.5        cluster_2.0.4      
+## [43] MASS_7.3-45         Matrix_1.2-6        data.table_1.9.6   
+## [46] nnls_1.4            rmarkdown_1.0       iterators_1.0.8    
+## [49] multtest_2.28.0     igraph_1.0.1        nlme_3.1-128</code></pre>
 </div>
 
 

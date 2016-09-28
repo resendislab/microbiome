@@ -4,12 +4,6 @@ author: "Christian Diener"
 output:
     html_document:
         toc: true
-        toc_float: true
-        theme: paper
-    pdf_document:
-        latex_engine: lualatex
-        toc: true
-        number_sections: true
 ---
 
 
