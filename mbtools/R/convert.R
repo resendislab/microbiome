@@ -5,7 +5,7 @@
 ANN_RE <- "\\|NN=(.+)\\|D=(.+);"
 
 
-hitdb_cleaner <- function(i, df, match, cutoff) {
+hitdb_cleaner <- function(i, df, match, cutoff = 99) {
     xn <- df[i, 1]
     x <- df[i, 2]
 
@@ -32,7 +32,7 @@ mothur_to_dada <- function(seq_file, taxa_file, out = "taxonomy.fa.gz") {
     matches <- str_match(taxa_df[, 2], ANN_RE)
 
     taxa <- vapply(1:nrow(taxa_df), hitdb_cleaner, "", df = taxa_df,
-                   match = matches, cutoff = 98)
+                   match = matches)
     names(taxa) <- taxa_df[, 1]
 
     seqs <- readFasta(seq_file)
