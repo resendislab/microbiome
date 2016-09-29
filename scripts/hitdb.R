@@ -4,7 +4,8 @@
 #
 # Apache license 2.0.
 
-library(mbtools)
+# use latest version
+devtools::load_all("../mbtools")
 
 VERSION <- "v1.00"
 REPO <- sprintf("https://github.com/microbiome/HITdb/raw/master/HITdb_%s/",

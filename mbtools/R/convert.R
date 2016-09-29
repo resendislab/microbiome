@@ -2,18 +2,22 @@
 #
 # Apache license 2.0.
 
-ANN_RE <- "\\|NN=(.+)\\|D=(.+);"
+ANN_RE <- ";([\\w_.]+)\\|NN=(.+)\\|D=(.+);"
 
-
-hitdb_cleaner <- function(i, df, match, cutoff = 99) {
+# cutoff larger than 100 means never use nearest-neighbor
+hitdb_cleaner <- function(i, df, match, cutoff = 101) {
     xn <- df[i, 1]
     x <- df[i, 2]
 
     x <- sub("\\|.+;", ";", x)
-    if (!is.na(match[i, 1]) && as.numeric(match[i, 3]) > cutoff) {
-        x <- sub(xn, match[i, 2], x)
-    } else x <- sub(xn, "unclassified", x)
-    x
+    if (all(!is.na(match[i, ]))) {
+        if (as.numeric(match[i, 4]) > cutoff)
+            x <- sub(match[i, 2], match[i, 3], x)
+        else x <- sub(match[i, 2], "unclassified", x)
+    }
+
+    # dada2 nows about empty fields so we do not need placeholders
+    gsub("[Uu]nclassified;", "", x)
 }
 
 #' Converts taxa annotations from mothur format to dada2 format.
@@ -31,12 +35,12 @@ mothur_to_dada <- function(seq_file, taxa_file, out = "taxonomy.fa.gz") {
     taxa_df <- read.table(taxa_file, header = FALSE)
     matches <- str_match(taxa_df[, 2], ANN_RE)
 
-    taxa <- vapply(1:nrow(taxa_df), hitdb_cleaner, "", df = taxa_df,
+    tax <- vapply(1:nrow(taxa_df), hitdb_cleaner, "", df = taxa_df,
                    match = matches)
-    names(taxa) <- taxa_df[, 1]
+    names(tax) <- taxa_df[, 1]
 
     seqs <- readFasta(seq_file)
     ids <- as.character(id(seqs))
-    seqs <- ShortRead(sread(seqs), BStringSet(taxa[ids]))
+    seqs <- ShortRead(sread(seqs), BStringSet(tax[ids]))
     writeFasta(seqs, out, compress = TRUE)
 }
