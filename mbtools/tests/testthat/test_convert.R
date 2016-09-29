@@ -17,5 +17,5 @@ test_that("we can convert HITdb", {
     ids <- as.character(id(seqs))
     nlev <- sapply(strsplit(ids, ";", fixed = TRUE), length)
 
-    expect_true(all(nlev == 6))
+    expect_true(all(nlev <= 6))
 })

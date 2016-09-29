@@ -10,7 +10,7 @@ taxa_quants(ps, ref, normalize = FALSE)
 \item{ps}{A phyloseq object describing the measurements}
 
 \item{ref}{A phyloseq object describing the reference set. Can be obtained
-from \link{\code{mockrobiota}}.}
+from \code{\link{mockrobiota}}.}
 
 \item{normalize}{Whether to normalize taxa counts first.}
 }

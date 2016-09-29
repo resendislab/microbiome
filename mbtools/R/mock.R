@@ -161,7 +161,7 @@ taxa_metrics <- function(tax_table, ref) {
 #'
 #' @param ps A phyloseq object describing the measurements
 #' @param ref A phyloseq object describing the reference set. Can be obtained
-#'  from \link{\code{mockrobiota}}.
+#'  from \code{\link{mockrobiota}}.
 #' @param normalize Whether to normalize taxa counts first.
 #' @return A data frame with the following columns:
 #'  \describe{
@@ -227,7 +227,7 @@ taxa_quants <- function(ps, ref, normalize = FALSE) {
 #'
 #' @param ps A phyloseq object describing the measurements
 #' @param ref A phyloseq object describing the reference set. Can be obtained
-#'  from \link{\code{mockrobiota}}.
+#'  from \code{\link{mockrobiota}}.
 #' @return A ggplot2 plot.
 #' @examples
 #'  NULL

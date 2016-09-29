@@ -10,7 +10,7 @@ mock_plot(ps, ref)
 \item{ps}{A phyloseq object describing the measurements}
 
 \item{ref}{A phyloseq object describing the reference set. Can be obtained
-from \link{\code{mockrobiota}}.}
+from \code{\link{mockrobiota}}.}
 }
 \value{
 A ggplot2 plot.
