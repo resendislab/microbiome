@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="Christian Diener" />
+
+
+<title>Taxonomy assignment with HITdb</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<link rel="stylesheet"
+      href="site_libs/highlight/textmate.css"
+      type="text/css" />
+<script src="site_libs/highlight/highlight.js"></script>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.9em;
+  padding-left: 5px;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+  padding-left: 10px;
+}
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">mbtools</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Examples
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="mock_example.html">Mock community</a>
+    </li>
+    <li>
+      <a href="hitdb_example.html">Taxonmy assignment with HITdb</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/cdiener/microbiome">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="https://hub.docker.com/r/cdiener/microbiome/">
+    <span class="fa fa-cloud fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Taxonomy assignment with HITdb</h1>
+<h4 class="author"><em>Christian Diener</em></h4>
+
+</div>
+
+
+<p>When analyzing intestinal samples you might want to prefer to use a dedicated database which includes a curated set of microbes that are known to be present in the intestines. This database is provided by <a href="http://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-015-2265-y">HITdb</a>. The potential advantages are:</p>
+<ul>
+<li>faster taxonomy assignment since the database is smaller</li>
+<li>better taxonomy assignement, specifically on the species level (according to the publication)</li>
+<li>easy detection of contamination since those sequence variants are classified as NA</li>
+</ul>
+<p>The obvious disadvantage is that HITdb only works for intestinal samples.</p>
+<div id="getting-hitdb-for-dada2" class="section level2">
+<h2>Getting HITdb for dada2</h2>
+<p>If you use the <code>mbtools</code> HITdb is included as an extra file. You can get the file path with</p>
+<pre class="r"><code>hitdb &lt;- system.file(&quot;extdata&quot;, &quot;hitdb_v1.00.fa.gz&quot;, package = &quot;mbtools&quot;)</code></pre>
+<p>If you are not using the package it can be obtained from Zenodo with the <a href="http://doi.org/10.5281/zenodo.159205">DOI 10.5281/zenodo.159205</a>.</p>
+</div>
+<div id="how-to-use-it" class="section level2">
+<h2>How to use it</h2>
+<p>We will load the sequence table we created in the mock example.</p>
+<pre class="r"><code>seqtab &lt;- readRDS(&quot;svs.rds&quot;)</code></pre>
+<p>Now we assign the taxonomy using HITdb</p>
+<pre class="r"><code>library(dada2)
+taxa &lt;- assignTaxonomy(seqtab, hitdb)
+colnames(taxa) &lt;- c(&quot;Phylum&quot;, &quot;Class&quot;, &quot;Order&quot;, &quot;Family&quot;, &quot;Genus&quot;, &quot;Species&quot;)</code></pre>
+<p>Don’t forget to assign the column names as we did here since Dada2 will assign incorrect ones by default.</p>
+<p>And we are done :)</p>
+<pre class="r"><code>rownames(taxa) &lt;- NULL  # drop the sequences for now
+head(taxa)</code></pre>
+<pre><code>##      Phylum                Class                 Order            
+## [1,] &quot;Firmicutes&quot;          &quot;Bacilli&quot;             &quot;Bacillales&quot;     
+## [2,] &quot;Firmicutes&quot;          &quot;Bacilli&quot;             &quot;Lactobacillales&quot;
+## [3,] &quot;Proteobacteria&quot;      &quot;Gammaproteobacteria&quot; &quot;Pseudomonadales&quot;
+## [4,] &quot;Deinococcus-Thermus&quot; &quot;Deinococci&quot;          &quot;Deinococcales&quot;  
+## [5,] &quot;Proteobacteria&quot;      &quot;Gammaproteobacteria&quot; &quot;Pseudomonadales&quot;
+## [6,] &quot;Proteobacteria&quot;      &quot;Alphaproteobacteria&quot; &quot;Rhodobacterales&quot;
+##      Family              Genus            Species                
+## [1,] &quot;Staphylococcaceae&quot; &quot;Staphylococcus&quot; NA                     
+## [2,] &quot;Streptococcaceae&quot;  &quot;Streptococcus&quot;  &quot;Streptococcus_mutans&quot; 
+## [3,] &quot;Moraxellaceae&quot;     &quot;Acinetobacter&quot;  NA                     
+## [4,] &quot;Deinococcaceae&quot;    &quot;Deinococcus&quot;    &quot;Deinococcus_aquaticus&quot;
+## [5,] &quot;Pseudomonadaceae&quot;  &quot;Pseudomonas&quot;    NA                     
+## [6,] &quot;Rhodobacteraceae&quot;  &quot;Paracoccus&quot;     NA</code></pre>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+$(document).ready(function () {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+});
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

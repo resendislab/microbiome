@@ -1,0 +1,59 @@
+---
+title: "Taxonomy assignment with HITdb"
+author: "Christian Diener"
+output:
+    html_document:
+        toc: true
+---
+
+When analyzing intestinal samples you might want to prefer to use a
+dedicated database which includes a curated set of microbes that are
+known to be present in the intestines. This database is provided by
+[HITdb](http://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-015-2265-y).
+The potential advantages are:
+
+- faster taxonomy assignment since the database is smaller
+- better taxonomy assignement, specifically on the species level
+  (according to the publication)
+- easy detection of contamination since those sequence variants are classified
+  as NA
+
+The obvious disadvantage is that HITdb only works for intestinal samples.
+
+## Getting HITdb for dada2
+
+If you use the `mbtools` HITdb is included as an extra file. You can get the
+file path with
+
+```{r}
+hitdb <- system.file("extdata", "hitdb_v1.00.fa.gz", package = "mbtools")
+```
+
+If you are not using the package it can be obtained from Zenodo with
+the [DOI 10.5281/zenodo.159205](http://doi.org/10.5281/zenodo.159205).
+
+## How to use it
+
+We will load the sequence table we created in the mock example.
+
+```{r}
+seqtab <- readRDS("svs.rds")
+```
+
+Now we assign the taxonomy using HITdb
+
+```{r}
+library(dada2)
+taxa <- assignTaxonomy(seqtab, hitdb)
+colnames(taxa) <- c("Phylum", "Class", "Order", "Family", "Genus", "Species")
+```
+
+Don't forget to assign the column names as we did here since Dada2 will assign
+incorrect ones by default.
+
+And we are done :)
+
+```{r}
+rownames(taxa) <- NULL  # drop the sequences for now
+head(taxa)
+```
