@@ -15,7 +15,7 @@
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
@@ -98,34 +98,34 @@ button.code-folding-btn:focus {
 <style type="text/css">
 /* padding for bootstrap navbar */
 body {
-  padding-top: 60px;
+  padding-top: 51px;
   padding-bottom: 40px;
 }
 /* offset scroll position for anchor links (for fixed navbar)  */
 .section h1 {
-  padding-top: 65px;
-  margin-top: -65px;
+  padding-top: 56px;
+  margin-top: -56px;
 }
 
 .section h2 {
-  padding-top: 65px;
-  margin-top: -65px;
+  padding-top: 56px;
+  margin-top: -56px;
 }
 .section h3 {
-  padding-top: 65px;
-  margin-top: -65px;
+  padding-top: 56px;
+  margin-top: -56px;
 }
 .section h4 {
-  padding-top: 65px;
-  margin-top: -65px;
+  padding-top: 56px;
+  margin-top: -56px;
 }
 .section h5 {
-  padding-top: 65px;
-  margin-top: -65px;
+  padding-top: 56px;
+  margin-top: -56px;
 }
 .section h6 {
-  padding-top: 65px;
-  margin-top: -65px;
+  padding-top: 56px;
+  margin-top: -56px;
 }
 </style>
 
@@ -188,7 +188,10 @@ $(document).ready(function () {
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="mock_example.html">Mock example</a>
+      <a href="mock_example.html">Mock community</a>
+    </li>
+    <li>
+      <a href="hitdb_example.html">Taxonmy assignment with HITdb</a>
     </li>
   </ul>
 </li>
@@ -200,12 +203,6 @@ $(document).ready(function () {
         <li>
   <a href="https://github.com/cdiener/microbiome">
     <span class="fa fa-github fa-lg"></span>
-     
-  </a>
-</li>
-<li>
-  <a href="https://github.com/cdiener/microbiome/issues">
-    <span class="fa fa-question fa-lg"></span>
      
   </a>
 </li>
@@ -237,12 +234,12 @@ $(document).ready(function () {
 ## Running under: Debian GNU/Linux 8 (jessie)
 ## 
 ## locale:
-##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
-##  [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
-##  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
-##  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
-##  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
-## [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+##  [1] LC_CTYPE=en_US.utf8       LC_NUMERIC=C             
+##  [3] LC_TIME=en_US.utf8        LC_COLLATE=en_US.utf8    
+##  [5] LC_MONETARY=en_US.utf8    LC_MESSAGES=en_US.utf8   
+##  [7] LC_PAPER=en_US.utf8       LC_NAME=C                
+##  [9] LC_ADDRESS=C              LC_TELEPHONE=C           
+## [11] LC_MEASUREMENT=en_US.utf8 LC_IDENTIFICATION=C      
 ## 
 ## attached base packages:
 ## [1] stats4    parallel  stats     graphics  grDevices utils     datasets 
@@ -258,22 +255,22 @@ $(document).ready(function () {
 ## [13] Biostrings_2.40.2          XVector_0.12.1            
 ## [15] IRanges_2.6.1              S4Vectors_0.10.3          
 ## [17] BiocGenerics_0.18.0        ggplot2_2.1.0             
-## [19] dada2_1.1.6                Rcpp_0.12.7               
-## [21] mbtools_0.5.0             
+## [19] mbtools_0.5.1              dada2_1.1.6               
+## [21] Rcpp_0.12.7               
 ## 
 ## loaded via a namespace (and not attached):
 ##  [1] reshape2_1.4.1      splines_3.3.1       lattice_0.20-33    
 ##  [4] rhdf5_2.16.0        colorspace_1.2-6    htmltools_0.3.5    
-##  [7] yaml_2.1.13         mgcv_1.8-12         chron_2.3-47       
+##  [7] mgcv_1.8-12         yaml_2.1.13         chron_2.3-47       
 ## [10] survival_2.39-4     R.oo_1.20.0         R.utils_2.4.0      
 ## [13] RColorBrewer_1.1-2  foreach_1.4.3       plyr_1.8.4         
 ## [16] stringr_1.1.0       zlibbioc_1.18.0     munsell_0.4.3      
-## [19] gtable_0.2.0        hwriter_1.3.2       R.methodsS3_1.7.1  
+## [19] gtable_0.2.0        R.methodsS3_1.7.1   hwriter_1.3.2      
 ## [22] codetools_0.2-14    evaluate_0.9        labeling_0.3       
 ## [25] latticeExtra_0.6-28 knitr_1.14          permute_0.9-4      
 ## [28] biomformat_1.0.2    scales_0.4.0        vegan_2.4-1        
 ## [31] RcppParallel_4.3.20 jsonlite_1.1        fastmatch_1.0-4    
-## [34] digest_0.6.10       stringi_1.1.1       grid_3.3.1         
+## [34] digest_0.6.10       stringi_1.1.2       grid_3.3.1         
 ## [37] ade4_1.7-4          quadprog_1.5-5      tools_3.3.1        
 ## [40] bitops_1.0-6        magrittr_1.5        cluster_2.0.4      
 ## [43] MASS_7.3-45         Matrix_1.2-6        data.table_1.9.6   

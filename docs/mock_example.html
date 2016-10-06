@@ -19,7 +19,7 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
@@ -102,34 +102,34 @@ button.code-folding-btn:focus {
 <style type="text/css">
 /* padding for bootstrap navbar */
 body {
-  padding-top: 60px;
+  padding-top: 51px;
   padding-bottom: 40px;
 }
 /* offset scroll position for anchor links (for fixed navbar)  */
 .section h1 {
-  padding-top: 65px;
-  margin-top: -65px;
+  padding-top: 56px;
+  margin-top: -56px;
 }
 
 .section h2 {
-  padding-top: 65px;
-  margin-top: -65px;
+  padding-top: 56px;
+  margin-top: -56px;
 }
 .section h3 {
-  padding-top: 65px;
-  margin-top: -65px;
+  padding-top: 56px;
+  margin-top: -56px;
 }
 .section h4 {
-  padding-top: 65px;
-  margin-top: -65px;
+  padding-top: 56px;
+  margin-top: -56px;
 }
 .section h5 {
-  padding-top: 65px;
-  margin-top: -65px;
+  padding-top: 56px;
+  margin-top: -56px;
 }
 .section h6 {
-  padding-top: 65px;
-  margin-top: -65px;
+  padding-top: 56px;
+  margin-top: -56px;
 }
 </style>
 
@@ -293,7 +293,10 @@ div.tocify {
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="mock_example.html">Mock example</a>
+      <a href="mock_example.html">Mock community</a>
+    </li>
+    <li>
+      <a href="hitdb_example.html">Taxonmy assignment with HITdb</a>
     </li>
   </ul>
 </li>
@@ -305,12 +308,6 @@ div.tocify {
         <li>
   <a href="https://github.com/cdiener/microbiome">
     <span class="fa fa-github fa-lg"></span>
-     
-  </a>
-</li>
-<li>
-  <a href="https://github.com/cdiener/microbiome/issues">
-    <span class="fa fa-question fa-lg"></span>
      
   </a>
 </li>
@@ -475,17 +472,19 @@ names(derepFs) &lt;- names(derepRs) &lt;- names(barcodes)</code></pre>
 <pre class="r"><code>seqtab &lt;- cbind(
     makeSequenceTable(dadaFs),
     makeSequenceTable(dadaRs))</code></pre>
-<p>Finally, we will also remove bimeras (reads that are combinations of two other reads) from the data set.</p>
+<p>Finally, we will also remove bimeras (reads that are combinations of two other reads) from the data set. We will also save the sequence table for later use.</p>
 <pre class="r"><code>seqtab_nochim &lt;- removeBimeraDenovo(seqtab, verbose=TRUE)</code></pre>
 <pre><code>## Identified 6 bimeras out of 48 input sequences.</code></pre>
+<pre class="r"><code>saveRDS(seqtab_nochim, &quot;svs.rds&quot;)</code></pre>
 </div>
 <div id="taxonomy-assignment-and-validation" class="section level2">
 <h2>Taxonomy assignment and validation</h2>
-<p>In order to classify taxonomies for the individual sequence variants we will use the RDP algorithm with the green genes reference sequences. If you do not use the docker image this data set has to be downloaded first <a href="https://www.dropbox.com/sh/mfcivbudmc21cqt/AAB1l-AUM5uKvjrR33ct-cTXa">from here</a>.</p>
-<pre class="r"><code>file.exists(&quot;gg_13_8_train_set_97.fa.gz&quot;)</code></pre>
-<pre><code>## [1] TRUE</code></pre>
+<p>In order to classify taxonomies for the individual sequence variants we will use the RDP algorithm with the green genes reference sequences. If you do not use the docker image this data set has to be downloaded first <a href="http://doi.org/10.5281/zenodo.158955">from here</a>.</p>
+<pre class="r"><code>if (!file.exists(&quot;gg_138.fa.gz&quot;))
+    download.file(&quot;https://zenodo.org/record/158955/files/gg_13_8_train_set_97.fa.gz&quot;,
+        &quot;gg_138.fa.gz&quot;)</code></pre>
 <p>Axonomies can now be assigned by</p>
-<pre class="r"><code>taxa &lt;- assignTaxonomy(seqtab_nochim, &quot;gg_13_8_train_set_97.fa.gz&quot;)
+<pre class="r"><code>taxa &lt;- assignTaxonomy(seqtab_nochim, &quot;gg_138.fa.gz&quot;)
 colnames(taxa) &lt;- c(&quot;Kingdom&quot;, &quot;Phylum&quot;, &quot;Class&quot;, &quot;Order&quot;, &quot;Family&quot;, &quot;Genus&quot;, &quot;Species&quot;)
 head(unname(taxa))</code></pre>
 <pre><code>##      [,1]          [,2]                [,3]                    
@@ -554,13 +553,13 @@ head(tq)</code></pre>
 ##  Pearson&#39;s product-moment correlation
 ## 
 ## data:  tq$measured and tq$reference
-## t = 28.365, df = 318, p-value &lt; 2.2e-16
+## t = 28.522, df = 318, p-value &lt; 2.2e-16
 ## alternative hypothesis: true correlation is not equal to 0
 ## 95 percent confidence interval:
-##  0.8123629 0.8750184
+##  0.8139378 0.8761033
 ## sample estimates:
 ##       cor 
-## 0.8465985</code></pre>
+## 0.8479102</code></pre>
 <p>So we get a correlation of about 0.85 which is okay for the bad quality reads we used here.</p>
 </div>
 

@@ -15,7 +15,7 @@
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
@@ -98,34 +98,34 @@ button.code-folding-btn:focus {
 <style type="text/css">
 /* padding for bootstrap navbar */
 body {
-  padding-top: 60px;
+  padding-top: 51px;
   padding-bottom: 40px;
 }
 /* offset scroll position for anchor links (for fixed navbar)  */
 .section h1 {
-  padding-top: 65px;
-  margin-top: -65px;
+  padding-top: 56px;
+  margin-top: -56px;
 }
 
 .section h2 {
-  padding-top: 65px;
-  margin-top: -65px;
+  padding-top: 56px;
+  margin-top: -56px;
 }
 .section h3 {
-  padding-top: 65px;
-  margin-top: -65px;
+  padding-top: 56px;
+  margin-top: -56px;
 }
 .section h4 {
-  padding-top: 65px;
-  margin-top: -65px;
+  padding-top: 56px;
+  margin-top: -56px;
 }
 .section h5 {
-  padding-top: 65px;
-  margin-top: -65px;
+  padding-top: 56px;
+  margin-top: -56px;
 }
 .section h6 {
-  padding-top: 65px;
-  margin-top: -65px;
+  padding-top: 56px;
+  margin-top: -56px;
 }
 </style>
 
@@ -188,7 +188,10 @@ $(document).ready(function () {
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="mock_example.html">Mock example</a>
+      <a href="mock_example.html">Mock community</a>
+    </li>
+    <li>
+      <a href="hitdb_example.html">Taxonmy assignment with HITdb</a>
     </li>
   </ul>
 </li>
@@ -200,12 +203,6 @@ $(document).ready(function () {
         <li>
   <a href="https://github.com/cdiener/microbiome">
     <span class="fa fa-github fa-lg"></span>
-     
-  </a>
-</li>
-<li>
-  <a href="https://github.com/cdiener/microbiome/issues">
-    <span class="fa fa-question fa-lg"></span>
      
   </a>
 </li>
@@ -229,7 +226,7 @@ $(document).ready(function () {
 </div>
 
 
-<p><a href="https://app.wercker.com/project/bykey/ef9cd211a697b9ae558269dab4ee619e"><img src="https://app.wercker.com/status/ef9cd211a697b9ae558269dab4ee619e/s" title="wercker status" alt="wercker status" /></a> <a href="https://codecov.io/gh/cdiener/microbiome"><img src="https://codecov.io/gh/cdiener/microbiome/branch/master/graph/badge.svg" alt="codecov" /></a> <a href="https://hub.docker.com/r/cdiener/microbiome/"><img src="https://img.shields.io/docker/pulls/cdiener/microbiome.svg?maxAge=2592000" alt="Docker Pulls" /></a></p>
+<p><a href="https://app.wercker.com/project/bykey/ef9cd211a697b9ae558269dab4ee619e"><img src="https://app.wercker.com/status/ef9cd211a697b9ae558269dab4ee619e/s" title="wercker status" alt="wercker status" /></a> <a href="https://codecov.io/gh/cdiener/microbiome"><img src="https://codecov.io/gh/cdiener/microbiome/branch/master/graph/badge.svg" alt="codecov" /></a></p>
 <div id="installation" class="section level2">
 <h2>Installation</h2>
 <p>If you want to perform Human sequence removal you will need <a href="ftp://ftp.ncbi.nlm.nih.gov/pub/agarwala/bmtagger/">bmtagger</a> installed. The tools are bundled in the <code>mbtools</code> R package which also depends on all additional packages you need to run the analyses. You will need to <a href="https://www.bioconductor.org/install/">install bioconductor first</a> followed by running</p>
@@ -243,13 +240,16 @@ devtools::install_github(&#39;cdiener/microbiome/mbtools&#39;)</code></pre>
 <p>First get the image with</p>
 <pre class="bash"><code>docker pull cdiener/microbiome</code></pre>
 <p>You can now start a Rstudio instance at port 8000 using</p>
-<pre><code>docker run -d -p 8000:8787 cdiener/microbiome</code></pre>
+<pre class="bash"><code>docker run -d -p 8000:8787 cdiener/microbiome</code></pre>
 <p>Now navigate your browser to <your-ip>:8000 (for instance localhost:8000 if you run docker on your machine) and you will be prompted for user credentials (use “rstudio” for user and password). All packages and dependencies are already installed here.</p>
 <div id="faq" class="section level3">
 <h3>FAQ</h3>
-<ul>
-<li>How do I change the password? Login to the rstudio account with the default credentials (user and password are “rstudio”). Click on the “Tools” in the menu bar and choose “Shell”. Type “passwd” and Enter. You will be promted for the old and new password.</li>
-</ul>
+<div id="how-do-i-change-the-password" class="section level4">
+<h4>How do I change the password?</h4>
+<p>When starting the docker container you can pass an option setting the password.</p>
+<pre class="bash"><code>docker run -d -p 8000:8787 -e PASSWORD=&quot;password&quot; cdiener/microbiome</code></pre>
+<p>To change the password of an already running container login to the rstudio account with the default credentials (user and password are “rstudio”). Click on the “Tools” in the menu bar and choose “Shell”. Type “passwd” and Enter. You will be promted for the old and new password.</p>
+</div>
 </div>
 </div>
 

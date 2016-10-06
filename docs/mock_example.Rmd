@@ -133,26 +133,30 @@ seqtab <- cbind(
 ```
 
 Finally, we will also remove bimeras (reads that are combinations of two other
-reads) from the data set.
+reads) from the data set. We will also save the sequence table for later use.
 
 ```{r}
 seqtab_nochim <- removeBimeraDenovo(seqtab, verbose=TRUE)
+saveRDS(seqtab_nochim, "svs.rds")
 ```
 
 ## Taxonomy assignment and validation
 
 In order to classify taxonomies for the individual sequence variants we will
 use the RDP algorithm with the green genes reference sequences. If you do not
-use the docker image this data set has to be downloaded first [from here](https://www.dropbox.com/sh/mfcivbudmc21cqt/AAB1l-AUM5uKvjrR33ct-cTXa).
+use the docker image this data set has to be downloaded first
+[from here](http://doi.org/10.5281/zenodo.158955).
 
 ```{r}
-file.exists("gg_13_8_train_set_97.fa.gz")
+if (!file.exists("gg_138.fa.gz"))
+    download.file("https://zenodo.org/record/158955/files/gg_13_8_train_set_97.fa.gz",
+        "gg_138.fa.gz")
 ```
 
 Axonomies can now be assigned by
 
 ```{r}
-taxa <- assignTaxonomy(seqtab_nochim, "gg_13_8_train_set_97.fa.gz")
+taxa <- assignTaxonomy(seqtab_nochim, "gg_138.fa.gz")
 colnames(taxa) <- c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
 head(unname(taxa))
 ```
