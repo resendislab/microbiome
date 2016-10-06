@@ -161,7 +161,15 @@ colnames(taxa) <- c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "S
 head(unname(taxa))
 ```
 
-This can be combined with quantifications using the phyloseq package.
+Since we used the green genes database there are some assignments which are
+actually empty such as the "s__" species. We will convert them to their correct
+NA value.
+
+```{r}
+taxa[grep("__$", taxa)] <- NA
+```
+
+The taxa assignments can be combined with quantifications using the phyloseq package.
 
 ```{r}
 ps <- phyloseq(otu_table(seqtab_nochim, taxa_are_rows=FALSE),

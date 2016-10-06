@@ -134,7 +134,7 @@ find_taxa <- function(taxa1, taxa2, level="Species") {
 #'
 #' @param tax_table Measured taxonomy table.
 #' @param ref Reference taxonomy table.
-#' @return A data frame denoting the fraction of found taxa for each level.
+#' @return A data frame denoting performance metrics for taxa identification.
 #' @examples
 #'  NULL
 #'
@@ -145,9 +145,13 @@ taxa_metrics <- function(tax_table, ref) {
 
     metrics <- data.frame()
     for (cn in colnames(tax_table)) {
-        found <- find_taxa(ref, tax_table, level = cn)
-        new <- data.frame(level = cn, found = sum(found) / length(found),
-            n = length(found))
+        prec <- find_taxa(tax_table, ref, level = cn)
+        precision <- sum(prec) / length(prec)
+        rec <- find_taxa(ref, tax_table, level = cn)
+        recall <- sum(rec) / length(rec)
+        new <- data.frame(level = cn, precision = precision, recall = recall,
+                          F1 = 2 * precision * recall / (precision + recall),
+                          n_exp = length(prec), n_ref = length(rec))
         metrics <- rbind(metrics, new)
     }
 

@@ -15,11 +15,13 @@ ps <- phyloseq(tax_table(as.matrix(taxa)),
 
 test_that("taxa can be found and counted", {
     fi <- taxa_metrics(tax_table(ps), tax_table(ps))
-    expect_equivalent(fi$found, rep(1, 3))
+    expect_equivalent(fi$precision, rep(1, 3))
+    expect_equivalent(fi$recall, rep(1, 3))
+    expect_equivalent(fi$F1, rep(1, 3))
     expect_equal(nrow(fi), 3)
 
     fi <- taxa_metrics(tax_table(ps), tax_table(as.matrix(taxa[-1, ])))
-    expect_true(all(fi$found <= 1))
+    expect_true(all(fi$precision <= 1))
     expect_equal(nrow(fi), 3)
 })
 

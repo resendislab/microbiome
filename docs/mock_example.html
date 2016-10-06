@@ -508,19 +508,21 @@ head(unname(taxa))</code></pre>
 ## [4,] &quot;s__&quot;           
 ## [5,] &quot;s__&quot;           
 ## [6,] &quot;s__sphaeroides&quot;</code></pre>
-<p>This can be combined with quantifications using the phyloseq package.</p>
+<p>Since we used the green genes database there are some assignments which are actually empty such as the “s__&quot; species. We will convert them to their correct NA value.</p>
+<pre class="r"><code>taxa[grep(&quot;__$&quot;, taxa)] &lt;- NA</code></pre>
+<p>The taxa assignments can be combined with quantifications using the phyloseq package.</p>
 <pre class="r"><code>ps &lt;- phyloseq(otu_table(seqtab_nochim, taxa_are_rows=FALSE),
                tax_table(taxa))</code></pre>
 <p>We can now compare this table to our reference table from mockrobiota. We will start by quantifying how many of the real taxa were found in our taxonomy assignment.</p>
 <pre class="r"><code>taxa_metrics(tax_table(ps), tax_table(mock$ps_gg))</code></pre>
-<pre><code>##     level found  n
-## 1 Kingdom   1.0  2
-## 2  Phylum   1.0  6
-## 3   Class   1.0 10
-## 4   Order   1.0 12
-## 5  Family   1.0 18
-## 6   Genus   1.0 18
-## 7 Species   0.7 20</code></pre>
+<pre><code>##     level precision recall        F1 n_exp n_ref
+## 1 Kingdom 1.0000000    1.0 1.0000000     2     2
+## 2  Phylum 1.0000000    1.0 1.0000000     6     6
+## 3   Class 1.0000000    1.0 1.0000000    10    10
+## 4   Order 1.0000000    1.0 1.0000000    12    12
+## 5  Family 1.0000000    1.0 1.0000000    18    18
+## 6   Genus 1.0000000    1.0 1.0000000    18    18
+## 7 Species 0.6666667    0.3 0.4137931     9    20</code></pre>
 <p>As we can see we are pretty good in identifying the taxa in our samples. However, how do we perform in terms of taxa quantities? We will start by stratifying across the samples:</p>
 <pre class="r"><code>tq &lt;- taxa_quants(ps, mock$ps_gg, normalize = TRUE)
 head(tq)</code></pre>
@@ -537,7 +539,7 @@ head(tq)</code></pre>
     geom_smooth(aes(group=1), method=&quot;lm&quot;, lty=&quot;dashed&quot;) +
     geom_point() +
     facet_wrap(~ sample)</code></pre>
-<p><img src="mock_example_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<p><img src="mock_example_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
 <p>This plot is so common that it is also implemented in <code>mbtools</code> as <code>mock_plot</code>.</p>
 <p>Additionally, we can also combine all samples and rather stratify by taxonomy level.</p>
 <pre class="r"><code>ggplot(tq, aes(x=reference, y=measured, col=sample)) +
@@ -546,20 +548,20 @@ head(tq)</code></pre>
     geom_point() +
     theme(legend.position=&quot;bottom&quot;) +
     facet_wrap(~ level, scale=&quot;free&quot;)</code></pre>
-<p><img src="mock_example_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+<p><img src="mock_example_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
 <p>This looks pretty ok with larger variations on the species level, which is to be expected. We can quantify the performance by a correlation test.</p>
 <pre class="r"><code>cor.test(tq$measured, tq$reference)</code></pre>
 <pre><code>## 
 ##  Pearson&#39;s product-moment correlation
 ## 
 ## data:  tq$measured and tq$reference
-## t = 28.522, df = 318, p-value &lt; 2.2e-16
+## t = 27.518, df = 286, p-value &lt; 2.2e-16
 ## alternative hypothesis: true correlation is not equal to 0
 ## 95 percent confidence interval:
-##  0.8139378 0.8761033
+##  0.8168206 0.8808135
 ## sample estimates:
 ##       cor 
-## 0.8479102</code></pre>
+## 0.8519678</code></pre>
 <p>So we get a correlation of about 0.85 which is okay for the bad quality reads we used here.</p>
 </div>
 

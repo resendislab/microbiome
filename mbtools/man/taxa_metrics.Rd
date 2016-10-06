@@ -12,7 +12,7 @@ taxa_metrics(tax_table, ref)
 \item{ref}{Reference taxonomy table.}
 }
 \value{
-A data frame denoting the fraction of found taxa for each level.
+A data frame denoting performance metrics for taxa identification.
 }
 \description{
 Note that both arguments must of class "taxonomyTable" from the
