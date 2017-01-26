@@ -15,21 +15,20 @@
 <title>Mock community example</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
-<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
-<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
-<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-1.1/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
 
 <style type="text/css">code{white-space: pre;}</style>
-<link rel="stylesheet"
-      href="site_libs/highlight/textmate.css"
-      type="text/css" />
-<script src="site_libs/highlight/highlight.js"></script>
 <style type="text/css">
   pre:not([class]) {
     background-color: white;
@@ -99,6 +98,7 @@ button.code-folding-btn:focus {
 }
 </style>
 
+
 <style type="text/css">
 /* padding for bootstrap navbar */
 body {
@@ -155,7 +155,6 @@ $(document).ready(function () {
 <div class="container-fluid main-container">
 
 <!-- tabsets -->
-<script src="site_libs/navigation-1.1/tabsets.js"></script>
 <script>
 $(document).ready(function () {
   window.buildTabsets("TOC");
@@ -181,7 +180,7 @@ $(document).ready(function ()  {
       theme: "bootstrap3",
       context: '.toc-content',
       hashGenerator: function (text) {
-        return text.replace(/[.\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
       },
       ignoreSelector: ".toc-ignore",
       scrollTo: 0
@@ -240,8 +239,9 @@ div.tocify {
 }
 
 .tocify-subheader .tocify-item {
-  font-size: 0.9em;
-  padding-left: 5px;
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
 }
 
 .tocify .list-group-item {
@@ -253,7 +253,6 @@ div.tocify {
 }
 .tocify-subheader .tocify-item {
   font-size: 0.95em;
-  padding-left: 10px;
 }
 
 </style>
@@ -332,7 +331,7 @@ div.tocify {
 </div>
 
 
-<p>For installtion instructions please see <a href="https://github.com/cdiener/microbiome">https://github.com/cdiener/microbiome</a>. We recommend using the docker image in the cloud or locally as this ensures that all requirements are fulfilled in the correct version.</p>
+<p>For installtion instructions please see <a href="https://github.com/cdiener/microbiome" class="uri">https://github.com/cdiener/microbiome</a>. We recommend using the docker image in the cloud or locally as this ensures that all requirements are fulfilled in the correct version.</p>
 <div id="loading-dependencies" class="section level2">
 <h2>Loading dependencies</h2>
 <p>In order to facilitate use of the pipeline we provide the <code>mbtools</code> R package in this repository which serves two major purposes:</p>
@@ -555,13 +554,13 @@ head(tq)</code></pre>
 ##  Pearson&#39;s product-moment correlation
 ## 
 ## data:  tq$measured and tq$reference
-## t = 27.518, df = 286, p-value &lt; 2.2e-16
+## t = 27.824, df = 286, p-value &lt; 2.2e-16
 ## alternative hypothesis: true correlation is not equal to 0
 ## 95 percent confidence interval:
-##  0.8168206 0.8808135
+##  0.8199355 0.8829104
 ## sample estimates:
 ##       cor 
-## 0.8519678</code></pre>
+## 0.8545329</code></pre>
 <p>So we get a correlation of about 0.85 which is okay for the bad quality reads we used here.</p>
 </div>
 
@@ -575,9 +574,13 @@ head(tq)</code></pre>
 <script>
 
 // add bootstrap table styles to pandoc tables
-$(document).ready(function () {
+function bootstrapStylePandocTables() {
   $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
 });
+
 
 </script>
 
