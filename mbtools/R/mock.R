@@ -55,7 +55,8 @@ mockrobiota <- function(name, folder, quiet=!interactive()) {
     samples <- read.table(mock_samples, header = TRUE)
     rownames(samples) <- samples[, 1]
 
-    gg <- sprintf("%s/%s/greengenes/13_8/expected-taxonomy.tsv", mb, name)
+    gg <- sprintf("%s/%s/greengenes/13-8/99-otus/expected-taxonomy.tsv",
+                  mb, name)
     gg <- read.table(gg, header = TRUE, sep = "\t")
     taxa <- as.character(gg[, 1])
     taxa <- do.call(rbind, strsplit(taxa, ";"))
@@ -63,7 +64,7 @@ mockrobiota <- function(name, folder, quiet=!interactive()) {
     gg <- phyloseq(tax_table(as.matrix(taxa)),
                    otu_table(gg[, -1], taxa_are_rows = TRUE),
                    sample_data(samples))
-    silva <- sprintf("%s/%s/silva/119/expected-taxonomy.tsv", mb, name)
+    silva <- sprintf("%s/%s/silva/123/99-otus/expected-taxonomy.tsv", mb, name)
     silva <- read.table(silva, header = TRUE, sep = "\t")
     taxa <- as.character(silva[, 1])
     taxa <- do.call(rbind, strsplit(taxa, ";"))
