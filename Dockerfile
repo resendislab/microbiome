@@ -20,5 +20,5 @@ RUN Rscript -e "source('http://bioconductor.org/biocLite.R'); \
     && rm -rf /tmp/*
 
 RUN mkdir /data
-COPY docs/mock_example.rmd /data
+COPY docs/mock_example.Rmd /data
 RUN chown -R rstudio:rstudio /data
