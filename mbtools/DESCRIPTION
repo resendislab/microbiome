@@ -15,7 +15,9 @@ Imports:
     dada2,
     ggplot2,
     stringr,
-    R.utils
+    R.utils,
+    data.table,
+    yaml
 License: Apache License (== 2.0)
 Encoding: UTF-8
 LazyData: true
