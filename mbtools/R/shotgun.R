@@ -8,10 +8,10 @@ alignment_rate <- function(log_file) {
         content <- readChar(log_file, file.info(log_file)$size)
         match <- str_match("(\\d+\\.*\\d*)% overall alignment rate")
         if (nrow(match) > 0) {
-            as.numeric(match[ ,2])/100
+            return(as.numeric(match[ ,2])/100)
         }
     }
-    return NULL
+    return(NULL)
 }
 
 
