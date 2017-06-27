@@ -2,6 +2,19 @@
 #
 # Apache license 2.0. See LICENSE for more information.
 
+#' @importFrom stringr str_match
+alignment_rate <- function(log_file) {
+    if (file.exists(log_file)) {
+        content <- readChar(log_file, file.info(log_file)$size)
+        match <- str_match("(\\d+\\.*\\d*)% overall alignment rate")
+        if (nrow(match) > 0) {
+            as.numeric(match[ ,2])/100
+        }
+    }
+    return NULL
+}
+
+
 #' Aligns metagenomic shotgun sample against a reference
 #'
 #' This method uses bowtie2 and should not be too sensitive to the used pre-
@@ -44,6 +57,24 @@ align_bowtie2 <- function(reads, index_basename, threads=1,
     write("Aligning reads to microbial genomes...", file="")
     alignments <- pbapply(reads, 1, function(read) {
         read <- as.list(read)
+        log_file <- file.path(alignment_folder, paste0(read$id, ".log"))
+
+        if (file.exists(log_file)) {
+            rate <- alignment_rate(log_file)
+
+            if (bam) {
+                out_path <- file.path(alignment_folder, 
+                                      paste0(read$id, ".bam"))
+            } else {
+                out_path <- file.path(alignment_folder, 
+                                      paste0(read$id, ".sam"))
+            }
+            if (!is.null(rate) && file.exists(out_path)) {
+                return(data.frame(id = read$id, success = TRUE, 
+                       log = log_file, alignment = out_path, rate = rate))
+            }
+        }
+
         args <- c("-x", index_basename)
         if (paired) {
             args <- append(args, c("-1", read$forward, "-2", read$reverse))
@@ -53,7 +84,6 @@ align_bowtie2 <- function(reads, index_basename, threads=1,
         args <- append(args, c("-q", "--no-unal", "--mm", "-p", threads, "-k",
                                "60"))
 
-        log_file <- file.path(alignment_folder, paste0(read$id, ".log"))
         if (bam) {
             out_path <- file.path(alignment_folder, paste0(read$id, ".bam"))
             args <- append(args, c(paste0("2>", log_file), "|", "samtools",
@@ -63,9 +93,13 @@ align_bowtie2 <- function(reads, index_basename, threads=1,
             args <- append(args, c("-S", out_path, "2>", log_file))
         }
         success <- system2("bowtie2", args = args, env = env)
+        rate <- NULL
+        if (success) {
+            rate <- alignment_rate(log_file)
+        }
 
         return(data.frame(id = read$id, success = success == 0, log = log_file,
-                          alignment = out_path))
+                          alignment = out_path, rate = rate))
     })
 
     return(do.call(rbind.data.frame, alignments))
