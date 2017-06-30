@@ -108,7 +108,7 @@ align_bowtie2 <- function(reads, index_basename, threads=1,
 
 #' Quantifies abundances for the bacteria using SLIMM
 #'
-#' @param alignments A data frame as output by \code(\link(align_bowtie2))
+#' @param alignments A data frame as output by \code{\link{align_bowtie2}}
 #' @param slimm_db Path for the SLIMM data base.
 #' @return A data table counting reads and relative abundances for all found
 #'  bacteria for several taxonomic ranks. It will contain the following columns:
