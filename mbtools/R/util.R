@@ -11,18 +11,20 @@
 #'  NULL
 #'
 #' @export
+#' @importFrom string str_match
+#' @importFrom tibble tibble
 sra_files <- function(path) {
-    files <- list.file(path, pattern=".fastq\\.*gz*", full.names=TRUE)
-    fwd <- grepl(files, "_1.fastq")
-    rev <- grepl(files, "_2.fastq")
+    files <- list.files(path, pattern=".fastq\\.*gz*", full.names=TRUE)
+    fwd <- grepl("_1.fastq", files)
+    rev <- grepl("_2.fastq", files)
     if (any(fwd) && sum(fwd) != sum(rev)) {
         stop("Some paired files are missing!")
     }
 
-    ids <- str_match(files, "([\\w\\d]+)_*\\d*\\.fastq")[, 2]
+    ids <- str_match(files, "([a-zA-Z\\d]+)_*\\d*\\.fastq")[, 2]
 
     if (any(fwd)) {
-        return(data.frame(id=ids, forward=files[fwd], reverse=files[rev]))
+        return(tibble(id=ids, forward=files[fwd], reverse=files[rev]))
     }
-    return(data.frame(id=ids, forward=files))
+    return(tibble(id=ids, forward=files))
 }
