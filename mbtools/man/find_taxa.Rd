@@ -28,4 +28,3 @@ table in the second one.
  NULL
 
 }
-

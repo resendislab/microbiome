@@ -24,4 +24,3 @@ Converts taxa annotations from mothur format to dada2 format.
  NULL
 
 }
-
