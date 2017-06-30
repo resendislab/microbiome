@@ -11,8 +11,8 @@
 #'  NULL
 #'
 #' @export
-#' @importFrom string str_match
-#' @importFrom tibble tibble
+#' @importFrom stringr str_match
+#' @importFrom data.table data.table
 sra_files <- function(path) {
     files <- list.files(path, pattern=".fastq\\.*gz*", full.names=TRUE)
     fwd <- grepl("_1.fastq", files)
@@ -24,7 +24,7 @@ sra_files <- function(path) {
     ids <- str_match(files, "([a-zA-Z\\d]+)_*\\d*\\.fastq")[, 2]
 
     if (any(fwd)) {
-        return(tibble(id=ids, forward=files[fwd], reverse=files[rev]))
+        return(data.table(id=ids[fwd], forward=files[fwd], reverse=files[rev]))
     }
-    return(tibble(id=ids, forward=files))
+    return(data.table(id=ids, forward=files))
 }
