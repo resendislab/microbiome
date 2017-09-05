@@ -42,6 +42,7 @@ alignment_rate <- function(log_file) {
 #'  NULL
 #'
 #' @export
+#' @importFrom pbapply pbapply pbsapply pblapply
 align_bowtie2 <- function(reads, index_basename, threads=1,
                           alignment_folder = "alignments", bam = TRUE,
                           bowtie2_path = NULL, samtools_path = NULL) {
@@ -70,7 +71,7 @@ align_bowtie2 <- function(reads, index_basename, threads=1,
                                       paste0(read$id, ".sam"))
             }
             if (!is.null(rate) && file.exists(out_path)) {
-                return(data.frame(id = read$id, success = TRUE, 
+                return(data.table(id = read$id, success = TRUE, 
                        log = log_file, alignment = out_path, rate = rate))
             }
         }
@@ -98,11 +99,11 @@ align_bowtie2 <- function(reads, index_basename, threads=1,
             rate <- alignment_rate(log_file)
         }
 
-        return(data.frame(id = read$id, success = success == 0, log = log_file,
+        return(data.table(id = read$id, success = success == 0, log = log_file,
                           alignment = out_path, rate = rate))
     })
 
-    return(do.call(rbind.data.frame, alignments))
+    return(rbindlist(alignments))
 }
 
 
@@ -110,6 +111,39 @@ align_bowtie2 <- function(reads, index_basename, threads=1,
 #'
 #' @param alignments A data frame as output by \code{\link{align_bowtie2}}
 #' @param slimm_db Path for the SLIMM data base.
+#' @return Path to the slimm output.
+#' @examples
+#'  NULL
+#'
+#' @export
+run_slimm <- function(alignments, slimm_db, reports = NULL) {
+    if (!all(alignments$success)) {
+        stop("some alignments were not successful!")
+    }
+    if (is.null(reports)) {
+        reports <- tempdir()
+    }
+
+    write("Running SLIMM...", file="")
+    ecodes <- pbsapply(as.character(alignments$alignment), function(al) {
+        ecode <- system2("slimm", args=c("-m", slimm_db, "-o", 
+                         file.path(reports, ""), al),
+                         stdout=file.path(reports, "slimm.log"), stderr = NULL)
+        return(ecode)
+    })
+
+    if (any(ecodes != 0)) {
+        stop(paste0("slimm terminated with an error, logs can be found in",
+                    file.path(reports, "slimm.log")))
+    }
+
+    return(reports)
+}
+
+
+#' Reads SLIMM output to a data table.
+#'
+#' @param reports Where the slimm output is stored.
 #' @return A data table counting reads and relative abundances for all found
 #'  bacteria for several taxonomic ranks. It will contain the following columns:
 #'  \itemize{
@@ -124,34 +158,20 @@ align_bowtie2 <- function(reads, index_basename, threads=1,
 #'  NULL
 #'
 #' @export
-#' @importFrom data.table fread rbindlist
-slimm <- function(alignments, slimm_db) {
-    if (any(alignments$success != 0)) {
-        stop("some alignments were not successful!")
-    }
-    reports <- tempdir()
-    write("Running SLIMM...", file="")
-    ecodes <- pbapply(alignments$alignment, function(al) {
-        ecode <- system2("slimm", args=c("-m", slimm_db, "-o", reports, al),
-                         stdout = NULL, stderr=file.path(reports, "slimm.log"))
-        return(ecode)
-    })
-
-    if (any(ecodes != 0)) {
-        stop(paste0("slimm terminated with an error, logs can be found in",
-                    file.path(reports, "slimm.log")))
-    }
-
-    write("Summarizing results", file="")
-    tsvs <- list.files(reports, pattern="_reported.tsv")
-    dts <- pbapply(tsvs, function(file) {
+#' @importFrom data.table fread rbindlist `:=`
+read_slimm <- function(reports) {
+    write("Summarizing results", file = "")
+    tsvs <- list.files(reports, pattern = "_reported.tsv", full.names = TRUE)
+    dts <- pblapply(tsvs, function(file) {
         elements <- strsplit(basename(file), "_")[[1]]
         id <- elements[1]
         rank <- elements[2]
-        dt <- fread(file, drop=1, col.names=c("name", "taxid", "reads", 
+        dt <- fread(file, drop = 1, col.names = c("name", "taxid", "reads",
                     "relative", "contributors", "coverage"))
-        dt$rank <- rank
-        dt$id <- id
+        dt[, "rank" := rank]
+        dt[, "id" := id]
+        dt[, "relative" := reads / sum(reads)]
+        dt
     })
 
     return(rbindlist(dts)) 

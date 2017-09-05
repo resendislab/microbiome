@@ -9,6 +9,7 @@ Depends:
 Imports:
     Biostrings,
     ShortRead,
+    pbapply,
     phyloseq,
     phangorn,
     msa,

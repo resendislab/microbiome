@@ -4,7 +4,7 @@
 
 <head>
 
-<meta charset="utf-8">
+<meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 
@@ -349,27 +349,20 @@ div.tocify {
 <p>We will load the sequence table we created in the mock example.</p>
 <pre class="r"><code>seqtab &lt;- readRDS(&quot;svs.rds&quot;)</code></pre>
 <p>Now we assign the taxonomy using HITdb</p>
-<pre class="r"><code>library(dada2)
-taxa &lt;- assignTaxonomy(seqtab, hitdb)
+<pre class="r"><code>library(dada2)</code></pre>
+<pre><code>## Loading required package: Rcpp</code></pre>
+<pre class="r"><code>taxa &lt;- assignTaxonomy(seqtab, hitdb)
 colnames(taxa) &lt;- c(&quot;Phylum&quot;, &quot;Class&quot;, &quot;Order&quot;, &quot;Family&quot;, &quot;Genus&quot;, &quot;Species&quot;)</code></pre>
 <p>Don’t forget to assign the column names as we did here since Dada2 will assign incorrect ones by default.</p>
 <p>And we are done :)</p>
 <pre class="r"><code>rownames(taxa) &lt;- NULL  # drop the sequences for now
 head(taxa)</code></pre>
-<pre><code>##      Phylum                Class                 Order            
-## [1,] &quot;Firmicutes&quot;          &quot;Bacilli&quot;             &quot;Bacillales&quot;     
-## [2,] &quot;Firmicutes&quot;          &quot;Bacilli&quot;             &quot;Lactobacillales&quot;
-## [3,] &quot;Proteobacteria&quot;      &quot;Gammaproteobacteria&quot; &quot;Pseudomonadales&quot;
-## [4,] &quot;Deinococcus-Thermus&quot; &quot;Deinococci&quot;          &quot;Deinococcales&quot;  
-## [5,] &quot;Proteobacteria&quot;      &quot;Gammaproteobacteria&quot; &quot;Pseudomonadales&quot;
-## [6,] &quot;Proteobacteria&quot;      &quot;Alphaproteobacteria&quot; &quot;Rhodobacterales&quot;
-##      Family              Genus            Species                
-## [1,] &quot;Staphylococcaceae&quot; &quot;Staphylococcus&quot; NA                     
-## [2,] &quot;Streptococcaceae&quot;  &quot;Streptococcus&quot;  &quot;Streptococcus_mutans&quot; 
-## [3,] &quot;Moraxellaceae&quot;     &quot;Acinetobacter&quot;  NA                     
-## [4,] &quot;Deinococcaceae&quot;    &quot;Deinococcus&quot;    &quot;Deinococcus_aquaticus&quot;
-## [5,] &quot;Pseudomonadaceae&quot;  &quot;Pseudomonas&quot;    NA                     
-## [6,] &quot;Rhodobacteraceae&quot;  &quot;Paracoccus&quot;     NA</code></pre>
+<pre><code>##      Phylum          Class             Order               
+## [1,] &quot;Euryarchaeota&quot; &quot;Methanobacteria&quot; &quot;Methanobacteriales&quot;
+##      Family                Genus               
+## [1,] &quot;Methanobacteriaceae&quot; &quot;Methanobrevibacter&quot;
+##      Species                              
+## [1,] &quot;Methanobrevibacter_smithii_U55233.1&quot;</code></pre>
 </div>
 
 
@@ -397,7 +390,7 @@ $(document).ready(function () {
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
     document.getElementsByTagName("head")[0].appendChild(script);
   })();
 </script>

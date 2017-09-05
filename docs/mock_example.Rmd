@@ -7,7 +7,7 @@ output:
 ---
 
 
-For installtion instructions please see https://github.com/cdiener/microbiome.
+For installation instructions please see https://github.com/cdiener/microbiome.
 We recommend using the docker image in the cloud or locally as this ensures
 that all requirements are fulfilled in the correct version.
 
@@ -34,10 +34,10 @@ the [mockrobiota database](https://peerj.com/preprints/2065/). For instance
 to download the mock-3 data set (relatively small) we can use
 
 ```{r}
-if (!file.exists("mock3.rds")) {
-    mock <- mockrobiota("mock-3", "mock3")
-    saveRDS(mock, "mock3.rds")
-} else mock <- readRDS("mock3.rds")
+if (!file.exists("mock4.rds")) {
+    mock <- mockrobiota("mock-4", "mock4")
+    saveRDS(mock, "mock4.rds")
+} else mock <- readRDS("mock4.rds")
 ```
 
 Here `mock` now includes annotations for the data set as a list.
@@ -84,10 +84,8 @@ are acceptable up to 100 bp.
 dir.create("filtered")
 fwd_filt <- file.path("filtered", basename(fwd))
 bwd_filt <- file.path("filtered", basename(bwd))
-for (i in seq_along(fwd)) {
-    fastqPairedFilter(c(fwd[i], bwd[i]), c(fwd_filt[i], bwd_filt[i]),
-        truncLen=c(150, 100), compress=T, verbose=T)
-}
+filterAndTrim(fwd, fwd_filt, bwd, bwd_filt, truncLen=c(150, 100),
+              compress=T, verbose=T, multithread=T)
 ```
 
 We will follow by dereplicating the reads which will yield the unique
@@ -103,12 +101,12 @@ names(derepFs) <- names(derepRs) <- names(barcodes)
 ## Obtaining the sequence variants (sequence OTUs)
 
 With the trimmed and dereplicated reads we can now advance to running the dada2
-algorithm to discover the unqiue sequence variants in our reads. We will do this
+algorithm to discover the unique sequence variants in our reads. We will do this
 separately for the forward and backward reads.
 
 ```{r}
-dadaFs <- dada(derepFs, err=NULL, selfConsist = TRUE)
-dadaRs <- dada(derepRs, err=NULL, selfConsist = TRUE)
+dadaFs <- dada(derepFs, err=NULL, selfConsist = TRUE, multithread = TRUE)
+dadaRs <- dada(derepRs, err=NULL, selfConsist = TRUE, multithread = TRUE)
 ```
 
 This will fit an error model that deconvolutes the original sequence variants
@@ -127,9 +125,7 @@ data set that there is no sufficient overlap. Thus, we will treat the forward an
 backward reads independently.
 
 ```{r}
-seqtab <- cbind(
-    makeSequenceTable(dadaFs),
-    makeSequenceTable(dadaRs))
+seqtab <- makeSequenceTable(mergePairs(dadaFs, derepFs, dadaRs, derepRs))
 ```
 
 Finally, we will also remove bimeras (reads that are combinations of two other
@@ -153,7 +149,7 @@ if (!file.exists("gg_138.fa.gz"))
         "gg_138.fa.gz")
 ```
 
-Axonomies can now be assigned by
+Taxonomies can now be assigned by
 
 ```{r}
 taxa <- assignTaxonomy(seqtab_nochim, "gg_138.fa.gz")
