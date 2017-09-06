@@ -21,4 +21,3 @@ This function has to be run only once to enable analysis.
  NULL
 
 }
-

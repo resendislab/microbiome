@@ -40,4 +40,3 @@ fastq files containing only the reads for a single barcode.
  NULL
 
 }
-

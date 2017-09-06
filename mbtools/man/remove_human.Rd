@@ -27,4 +27,3 @@ prior construction of the indices via \link{build_index}.
  NULL
 
 }
-
