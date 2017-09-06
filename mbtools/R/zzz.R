@@ -9,7 +9,8 @@
 #' @importFrom R.utils gunzip
 NULL
 
-pkgs <- c("ggplot2", "dada2", "phyloseq", "msa", "phangorn", "ShortRead")
+pkgs <- c("ggplot2", "dada2", "phyloseq", "msa", "phangorn", "ShortRead",
+          "data.table", "yaml")
 
 silent_lib <- function(...) suppressPackageStartupMessages(library(...))
 
@@ -19,6 +20,7 @@ silent_lib <- function(...) suppressPackageStartupMessages(library(...))
 
     if (length(needed) == 0) return()
 
+    needed <- sort(needed)
     vs <- sapply(needed, function(x) as.character(packageVersion(x)))
     packageStartupMessage(paste("Also loading:", needed, vs, collapse = "\n"))
     lapply(needed, silent_lib, character.only = TRUE, warn.conflicts = FALSE)
