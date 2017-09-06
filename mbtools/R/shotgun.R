@@ -20,17 +20,17 @@ alignment_rate <- function(log_file) {
 #' This method uses bowtie2 and should not be too sensitive to the used pre-
 #' processing.
 #'
-#' @param reads A data frame containing the paths to the forward and reverse 
+#' @param reads A data frame containing the paths to the forward and reverse
 #'  reads in fastq format. Needs to have at least columns "id" and "forward".
 #'  If the samples are paired you also need a column "reverse".
 #' @param index_basename Path and basename of the index against which to align.
 #' @param threads How many threads to use for bowtie2.
-#' @param alignment_folder A folder to which to save log output and the 
+#' @param alignment_folder A folder to which to save log output and the
 #'  generated alignment.
 #' @param bam Whether to output alignments in BAM format (requires samtools).
 #' @param bowtie2_path Path to the bowtie executables.
 #' @param samtools_path Path to samtools.
-#' @return A data frame mapping the alignments to the sample IDs. It will 
+#' @return A data frame mapping the alignments to the sample IDs. It will
 #'  contain the following columns:
 #'  \itemize{
 #'  \item{id}{the id of the sample}
@@ -64,14 +64,14 @@ align_bowtie2 <- function(reads, index_basename, threads=1,
             rate <- alignment_rate(log_file)
 
             if (bam) {
-                out_path <- file.path(alignment_folder, 
+                out_path <- file.path(alignment_folder,
                                       paste0(read$id, ".bam"))
             } else {
-                out_path <- file.path(alignment_folder, 
+                out_path <- file.path(alignment_folder,
                                       paste0(read$id, ".sam"))
             }
             if (!is.null(rate) && file.exists(out_path)) {
-                return(data.table(id = read$id, success = TRUE, 
+                return(data.table(id = read$id, success = TRUE,
                        log = log_file, alignment = out_path, rate = rate))
             }
         }
@@ -126,7 +126,7 @@ run_slimm <- function(alignments, slimm_db, reports = NULL) {
 
     write("Running SLIMM...", file="")
     ecodes <- pbsapply(as.character(alignments$alignment), function(al) {
-        ecode <- system2("slimm", args=c("-m", slimm_db, "-o", 
+        ecode <- system2("slimm", args=c("-m", slimm_db, "-o",
                          file.path(reports, ""), al),
                          stdout=file.path(reports, "slimm.log"), stderr = NULL)
         return(ecode)
@@ -158,7 +158,7 @@ run_slimm <- function(alignments, slimm_db, reports = NULL) {
 #'  NULL
 #'
 #' @export
-#' @importFrom data.table fread rbindlist `:=`
+#' @importFrom data.table fread rbindlist :=
 read_slimm <- function(reports) {
     write("Summarizing results", file = "")
     tsvs <- list.files(reports, pattern = "_reported.tsv", full.names = TRUE)
@@ -174,5 +174,5 @@ read_slimm <- function(reports) {
         dt
     })
 
-    return(rbindlist(dts)) 
+    return(rbindlist(dts))
 }

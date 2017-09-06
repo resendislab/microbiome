@@ -9,7 +9,7 @@ align_bowtie2(reads, index_basename, threads = 1,
   samtools_path = NULL)
 }
 \arguments{
-\item{reads}{A data frame containing the paths to the forward and reverse 
+\item{reads}{A data frame containing the paths to the forward and reverse
 reads in fastq format. Needs to have at least columns "id" and "forward".
 If the samples are paired you also need a column "reverse".}
 
@@ -17,7 +17,7 @@ If the samples are paired you also need a column "reverse".}
 
 \item{threads}{How many threads to use for bowtie2.}
 
-\item{alignment_folder}{A folder to which to save log output and the 
+\item{alignment_folder}{A folder to which to save log output and the
 generated alignment.}
 
 \item{bam}{Whether to output alignments in BAM format (requires samtools).}
@@ -27,7 +27,7 @@ generated alignment.}
 \item{samtools_path}{Path to samtools.}
 }
 \value{
-A data frame mapping the alignments to the sample IDs. It will 
+A data frame mapping the alignments to the sample IDs. It will
  contain the following columns:
  \itemize{
  \item{id}{the id of the sample}
