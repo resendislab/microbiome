@@ -2,6 +2,14 @@
 #
 # Apache license 2.0. See LICENSE for more information.
 
+#' Convert a mbquant data table to a matrix.
+#'
+#' @param long_data the mbquant data table.
+#' @return A matrix with samples on the rows and taxa on the columns.
+#' @examples
+#'  NULL
+#'
+#' @export
 #' @importFrom phyloseq otu_table tax_table
 #' @importFrom data.table dcast rbindlist
 as.matrix.mbquant <- function(long_data) {
@@ -12,6 +20,15 @@ as.matrix.mbquant <- function(long_data) {
     return(mat)
 }
 
+#' Count reads across a taxonomy level.
+#'
+#' @param ps A phyloseq object.
+#' @param lev The taxonomy level to count.
+#' @return A mbquant data table with the taxa counts in long format.
+#' @examples
+#'  NULL
+#'
+#' @export
 taxa_count <- function(ps, lev = "Genus") {
     otus <- as(otu_table(ps), "matrix")
     if (taxa_are_rows(ps)) {
@@ -31,4 +48,24 @@ taxa_count <- function(ps, lev = "Genus") {
     class(counts) <- c("mbquant", class(counts))
 
     return(counts)
+}
+
+
+#' Applies the specified types to a data frame-like object.
+#'
+#' @param df A data frame, data table or tibble.
+#' @param types A data frame with two columns: name and type.
+#' @return The same frame with updated column types.
+#' @examples
+#'  NULL
+#'
+#' @export
+apply_types <- function(df, types) {
+    for (i in 1:nrow(types)) {
+        name <- types$name[i]
+        type <- types$type[i]
+        df[[name]] <- do.call(paste0("as.", type), list(df[[name]]))
+    }
+
+    return(df)
 }

@@ -1,6 +1,8 @@
 FROM rocker/rstudio
 MAINTAINER "Christian Diener <mail[at]cdiener.com>"
 
+sudo apt-get update && sudo apt-get install -y --no-install-recommends zlib1g-dev
+
 # Setup bmtools
 RUN cd /tmp && \
     wget ftp://ftp.ncbi.nlm.nih.gov/blast/executables/LATEST/ncbi-blast-2.6.0+-x64-linux.tar.gz && \
