@@ -28,3 +28,26 @@ sra_files <- function(path) {
     }
     return(data.table(id=ids, forward=files))
 }
+
+#' Orlitsky's diminishing attenuation estimator (q2/3).
+#'
+#' @param counts A vector of counts for which to approximate discrete
+#'  probablities.
+#' @return A named vector `p` assigning a probability to each event in data.
+#'  Those do not sum up to one since there is also a remaining probability to
+#'  observe a new event given as p(new) = 1 - sum(p).
+#' @examples
+#'  x <- sample(1:10, 100, replace=T)
+#'  p <- orlitsky(x)
+#' @export
+orlitsky <- function(counts) {
+    n <- length(data)
+    phi <- c(tabulate(data), 0) # the prevalences, denoted by phi
+    cn <- ceiling((n+1)^1/3)    # a smoothing factor for the prevalences
+    new <- max(cn, phi[1] + 1)
+    probs <- (data + 1) * pmax(cn, phi[data + 1] + 1) / pmax(cn, phi[data])
+    if (hasnames(probs)) {
+        names(probs) <- names(data)
+    }
+    return(probs/sum(c(probs, new)))
+}

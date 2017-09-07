@@ -1,7 +1,7 @@
 FROM rocker/rstudio
 MAINTAINER "Christian Diener <mail[at]cdiener.com>"
 
-sudo apt-get update && sudo apt-get install -y --no-install-recommends zlib1g-dev
+RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends zlib1g-dev
 
 # Setup bmtools
 RUN cd /tmp && \

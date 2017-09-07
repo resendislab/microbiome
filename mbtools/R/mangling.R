@@ -20,11 +20,11 @@ as.matrix.mbquant <- function(long_data) {
     return(mat)
 }
 
-#' Count reads across a taxonomy level.
+#' Counts the reads for a specific taxonomy level.
 #'
 #' @param ps A phyloseq object.
-#' @param lev The taxonomy level to count.
-#' @return A mbquant data table with the taxa counts in long format.
+#' @param lev The taxonomy level at which to count.
+#' @return A mbquant data table containing the counts in "long" format.
 #' @examples
 #'  NULL
 #'
