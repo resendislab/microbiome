@@ -2,6 +2,14 @@
 #
 # Apache license 2.0. See LICENSE for more information.
 
+#' Converts a mbquant object to a matrix.
+#'
+#' @param long_data A mbquant data table.
+#' @return Nothing.
+#' @examples
+#'  NULL
+#'
+#' @export
 #' @importFrom phyloseq otu_table tax_table
 #' @importFrom data.table dcast rbindlist
 as.matrix.mbquant <- function(long_data) {
@@ -12,6 +20,15 @@ as.matrix.mbquant <- function(long_data) {
     return(mat)
 }
 
+#' Counts the reads for a specific taxonomy level.
+#'
+#' @param ps A phyloseq object.
+#' @param lev The taxonomy level at which to count.
+#' @return A mbquant data table containing the counts in "long" format.
+#' @examples
+#'  NULL
+#'
+#' @export
 taxa_count <- function(ps, lev = "Genus") {
     otus <- as(otu_table(ps), "matrix")
     if (taxa_are_rows(ps)) {
