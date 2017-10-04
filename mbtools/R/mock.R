@@ -49,8 +49,10 @@ mockrobiota <- function(name, folder, quiet=!interactive()) {
     names(ivec) <- as.character(info[, 1])
 
     dir.create(folder, showWarnings = FALSE)
+    dl_list <- ivec[dl]
+    dl_list <- dl_list[!is.na(dl_list)]
 
-    downloaded <- vapply(ivec[dl], download_reads, "", folder = folder,
+    downloaded <- vapply(dl_list, download_reads, "", folder = folder,
                          quiet = quiet)
     samples <- read.table(mock_samples, header = TRUE)
     rownames(samples) <- samples[, 1]
@@ -62,7 +64,7 @@ mockrobiota <- function(name, folder, quiet=!interactive()) {
     taxa <- do.call(rbind, strsplit(taxa, ";\\s*", perl = TRUE))
     colnames(taxa) <- L[1:ncol(taxa)]
     gg <- phyloseq(tax_table(as.matrix(taxa)),
-                   otu_table(gg[, -1], taxa_are_rows = TRUE),
+                   otu_table(gg[, -1, drop = FALSE], taxa_are_rows = TRUE),
                    sample_data(samples))
     silva <- sprintf("%s/%s/silva/123/99-otus/expected-taxonomy.tsv", mb, name)
     silva <- read.table(silva, header = TRUE, sep = "\t")
@@ -70,14 +72,14 @@ mockrobiota <- function(name, folder, quiet=!interactive()) {
     taxa <- do.call(rbind, strsplit(taxa, ";\\s*", perl = TRUE))
     colnames(taxa) <- L[1:ncol(taxa)]
     silva <- phyloseq(tax_table(as.matrix(taxa)),
-                      otu_table(silva[, -1], taxa_are_rows = TRUE),
+                      otu_table(silva[, -1, drop = FALSE], taxa_are_rows = TRUE),
                       sample_data(samples))
 
     list(
         description = ivec["human-readable-description"],
         forward = downloaded[1],
         reverse = downloaded[2],
-        index = downloaded[3],
+        index = ifelse(length(dl_list) == 3, downloaded[3], NA),
         citation = ivec["citation"],
         fragment = ivec["target-subfragment"],
         equipment = ivec["sequencing-instrument"],

@@ -60,11 +60,55 @@ taxa_count <- function(ps, lev = "Genus") {
 #'  NULL
 #'
 #' @export
-apply_types <- function(df, types) {
+types <- function(df, types) {
     for (i in 1:nrow(types)) {
         name <- types$name[i]
         type <- types$type[i]
         df[[name]] <- do.call(paste0("as.", type), list(df[[name]]))
+    }
+
+    return(df)
+}
+
+
+#' Discretize all continuous variables in a data frame.
+#'
+#' This function will attempt to balance the groups so they contain similar
+#' numbers of elements.
+#'
+#' @param df A data frame-like object.
+#' @param groups The number of groups into which to separate the data.
+#' @return The same data fram with updated columns.
+#' @examples
+#'  NULL
+#'
+#' @export
+#' @importFrom Hmisc cut2
+discretize <- function(df, groups = 3) {
+    for (col in names(df)) {
+        if (is.numeric(df[[col]])) {
+            df[[col]] <- cut2(df[[col]], g = groups)
+        }
+    }
+
+    return(df)
+}
+
+
+#' Standardize all continuous columns of a data frame.
+#'
+#' @param df A data frame-like object.
+#' @return The same data frame with standardized columns.
+#' @examples
+#'  NULL
+#'
+#' @export
+standardize <- function(df) {
+    for (col in names(df)) {
+        if (is.numeric(df[[col]])) {
+            df[[col]] <- (df[[col]] - mean(df[[col]], na.rm = TRUE))
+            df[[col]] <- df[[col]] / sd(df[[col]], na.rm = TRUE)
+        }
     }
 
     return(df)

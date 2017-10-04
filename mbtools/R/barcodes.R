@@ -47,7 +47,7 @@ split_barcodes <- function(reads, index, out, ref, n=1e5, max_ed=1) {
     if (dir.exists(out)) {
         unlink(file.path(out, "*.fastq.gz"))
     } else dir.create(out)
-    res <- c(unique = 0, nomatch = 0, multiple = 0)
+    res <- c(unique = 0, multiple = 0, nomatch = 0)
     nseq <- 0
 
     repeat {

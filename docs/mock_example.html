@@ -341,13 +341,6 @@ div.tocify {
 </ol>
 <p>So loading <code>mbtools</code> should be the first step when running the analysis</p>
 <pre class="r"><code>library(mbtools)</code></pre>
-<pre><code>## Also loading: data.table 1.10.4
-## Also loading: ggplot2 2.2.1
-## Also loading: msa 1.8.0
-## Also loading: phangorn 2.2.0
-## Also loading: phyloseq 1.20.0
-## Also loading: ShortRead 1.34.0
-## Also loading: yaml 2.1.14</code></pre>
 </div>
 <div id="getting-the-mock-community-data" class="section level2">
 <h2>Getting the mock community data</h2>
@@ -402,27 +395,34 @@ fwd</code></pre>
 <pre><code>## Warning in dir.create(&quot;filtered&quot;): &#39;filtered&#39; already exists</code></pre>
 <pre class="r"><code>fwd_filt &lt;- file.path(&quot;filtered&quot;, basename(fwd))
 bwd_filt &lt;- file.path(&quot;filtered&quot;, basename(bwd))
-filterAndTrim(fwd, fwd_filt, bwd, bwd_filt, truncLen=c(150, 100),
-              compress=T, verbose=T, multithread=T)</code></pre>
+filt &lt;- filterAndTrim(fwd, fwd_filt, bwd, bwd_filt,
+                      trimLeft=10, truncLen=c(140, 100),
+                      compress=T, multithread=T)
+filt</code></pre>
+<pre><code>##                                                   reads.in reads.out
+## HMPMockV1.1.Even1_mock-forward-read.fastq.gz       1236898   1216195
+## HMPMockV1.1.Even2_mock-forward-read.fastq.gz        808308    797208
+## HMPMockV1.2.Staggered1_mock-forward-read.fastq.gz   838791    825665
+## HMPMockV1.2.Staggered2_mock-forward-read.fastq.gz   918465    905396</code></pre>
 <p>We will follow by dereplicating the reads which will yield the unique sequences in the samples.</p>
 <pre class="r"><code>derepFs &lt;- derepFastq(fwd_filt, verbose=TRUE)</code></pre>
 <pre><code>## Dereplicating sequence entries in Fastq file: filtered/HMPMockV1.1.Even1_mock-forward-read.fastq.gz</code></pre>
-<pre><code>## .Encountered 116490 unique sequences from 1216141 total sequences read.
+<pre><code>## .Encountered 95580 unique sequences from 1216195 total sequences read.
 ## Dereplicating sequence entries in Fastq file: filtered/HMPMockV1.1.Even2_mock-forward-read.fastq.gz
-## Encountered 92333 unique sequences from 797182 total sequences read.
+## Encountered 72797 unique sequences from 797208 total sequences read.
 ## Dereplicating sequence entries in Fastq file: filtered/HMPMockV1.2.Staggered1_mock-forward-read.fastq.gz
-## Encountered 96309 unique sequences from 825632 total sequences read.
+## Encountered 76415 unique sequences from 825665 total sequences read.
 ## Dereplicating sequence entries in Fastq file: filtered/HMPMockV1.2.Staggered2_mock-forward-read.fastq.gz
-## Encountered 87539 unique sequences from 905358 total sequences read.</code></pre>
+## Encountered 72114 unique sequences from 905396 total sequences read.</code></pre>
 <pre class="r"><code>derepRs &lt;- derepFastq(bwd_filt, verbose=TRUE)</code></pre>
 <pre><code>## Dereplicating sequence entries in Fastq file: filtered/HMPMockV1.1.Even1_mock-reverse-read.fastq.gz
-## .Encountered 123280 unique sequences from 1216141 total sequences read.
+## .Encountered 106375 unique sequences from 1216195 total sequences read.
 ## Dereplicating sequence entries in Fastq file: filtered/HMPMockV1.1.Even2_mock-reverse-read.fastq.gz
-## Encountered 76539 unique sequences from 797182 total sequences read.
+## Encountered 68054 unique sequences from 797208 total sequences read.
 ## Dereplicating sequence entries in Fastq file: filtered/HMPMockV1.2.Staggered1_mock-reverse-read.fastq.gz
-## Encountered 88797 unique sequences from 825632 total sequences read.
+## Encountered 80575 unique sequences from 825665 total sequences read.
 ## Dereplicating sequence entries in Fastq file: filtered/HMPMockV1.2.Staggered2_mock-reverse-read.fastq.gz
-## Encountered 82773 unique sequences from 905358 total sequences read.</code></pre>
+## Encountered 70459 unique sequences from 905396 total sequences read.</code></pre>
 <pre class="r"><code># Name the derep-class objects by the sample names
 names(derepFs) &lt;- names(derepRs) &lt;- names(barcodes)</code></pre>
 </div>
@@ -431,24 +431,23 @@ names(derepFs) &lt;- names(derepRs) &lt;- names(barcodes)</code></pre>
 <p>With the trimmed and dereplicated reads we can now advance to running the dada2 algorithm to discover the unique sequence variants in our reads. We will do this separately for the forward and backward reads.</p>
 <pre class="r"><code>dadaFs &lt;- dada(derepFs, err=NULL, selfConsist = TRUE, multithread = TRUE)</code></pre>
 <pre><code>## Initializing error rates to maximum possible estimate.
-## Sample 1 - 1216141 reads in 116490 unique sequences.
-## Sample 2 - 797182 reads in 92333 unique sequences.
-## Sample 3 - 825632 reads in 96309 unique sequences.
-## Sample 4 - 905358 reads in 87539 unique sequences.
+## Sample 1 - 1216195 reads in 95580 unique sequences.
+## Sample 2 - 797208 reads in 72797 unique sequences.
+## Sample 3 - 825665 reads in 76415 unique sequences.
+## Sample 4 - 905396 reads in 72114 unique sequences.
 ##    selfConsist step 2 
 ##    selfConsist step 3 
 ##    selfConsist step 4 
 ##    selfConsist step 5 
-##    selfConsist step 6 
 ## 
 ## 
-## Convergence after  6  rounds.</code></pre>
+## Convergence after  5  rounds.</code></pre>
 <pre class="r"><code>dadaRs &lt;- dada(derepRs, err=NULL, selfConsist = TRUE, multithread = TRUE)</code></pre>
 <pre><code>## Initializing error rates to maximum possible estimate.
-## Sample 1 - 1216141 reads in 123280 unique sequences.
-## Sample 2 - 797182 reads in 76539 unique sequences.
-## Sample 3 - 825632 reads in 88797 unique sequences.
-## Sample 4 - 905358 reads in 82773 unique sequences.
+## Sample 1 - 1216195 reads in 106375 unique sequences.
+## Sample 2 - 797208 reads in 68054 unique sequences.
+## Sample 3 - 825665 reads in 80575 unique sequences.
+## Sample 4 - 905396 reads in 70459 unique sequences.
 ##    selfConsist step 2 
 ##    selfConsist step 3 
 ##    selfConsist step 4 
@@ -464,11 +463,13 @@ names(derepFs) &lt;- names(derepRs) &lt;- names(barcodes)</code></pre>
 <pre><code>## Warning: Transformation introduced infinite values in continuous y-axis</code></pre>
 <p><img src="mock_example_files/figure-html/unnamed-chunk-9-2.png" width="672" /></p>
 <p>We will now quantify the sequence variants for both samples and combine them. Normally we would try to actually combine the forward and backwards reads into larger reads and quantify those, however our read qualities were so bad in this data set that there is no sufficient overlap. Thus, we will treat the forward and backward reads independently.</p>
-<pre class="r"><code>seqtab &lt;- makeSequenceTable(mergePairs(dadaFs, derepFs, dadaRs, derepRs))</code></pre>
+<pre class="r"><code>seqtab_fwd &lt;- makeSequenceTable(dadaFs)
+seqtab_bwd &lt;- makeSequenceTable(dadaRs)
+seqtab &lt;- cbind(seqtab_fwd, seqtab_bwd)</code></pre>
 <p>Finally, we will also remove bimeras (reads that are combinations of two other reads) from the data set. We will also save the sequence table for later use.</p>
 <pre class="r"><code>seqtab_nochim &lt;- removeBimeraDenovo(seqtab, verbose=TRUE)</code></pre>
 <pre><code>## As of the 1.4 release, the default method changed to consensus (from pooled).</code></pre>
-<pre><code>## Identified 0 bimeras out of 1 input sequences.</code></pre>
+<pre><code>## Identified 270 bimeras out of 365 input sequences.</code></pre>
 <pre class="r"><code>saveRDS(seqtab_nochim, &quot;svs.rds&quot;)</code></pre>
 </div>
 <div id="taxonomy-assignment-and-validation" class="section level2">
@@ -478,15 +479,30 @@ names(derepFs) &lt;- names(derepRs) &lt;- names(barcodes)</code></pre>
     download.file(&quot;https://zenodo.org/record/158955/files/gg_13_8_train_set_97.fa.gz&quot;,
         &quot;gg_138.fa.gz&quot;)</code></pre>
 <p>Taxonomies can now be assigned by</p>
-<pre class="r"><code>taxa &lt;- assignTaxonomy(seqtab_nochim, &quot;gg_138.fa.gz&quot;)
+<pre class="r"><code>taxa &lt;- assignTaxonomy(seqtab_nochim, &quot;gg_138.fa.gz&quot;, multithread=TRUE)
 colnames(taxa) &lt;- c(&quot;Kingdom&quot;, &quot;Phylum&quot;, &quot;Class&quot;, &quot;Order&quot;, &quot;Family&quot;, &quot;Genus&quot;, &quot;Species&quot;)
 head(unname(taxa))</code></pre>
-<pre><code>##      [,1]         [,2]               [,3]                
-## [1,] &quot;k__Archaea&quot; &quot;p__Euryarchaeota&quot; &quot;c__Methanobacteria&quot;
-##      [,4]                    [,5]                    
-## [1,] &quot;o__Methanobacteriales&quot; &quot;f__Methanobacteriaceae&quot;
-##      [,6]                    [,7] 
-## [1,] &quot;g__Methanobrevibacter&quot; &quot;s__&quot;</code></pre>
+<pre><code>##      [,1]          [,2]                [,3]                    
+## [1,] &quot;k__Bacteria&quot; &quot;p__Firmicutes&quot;     &quot;c__Bacilli&quot;            
+## [2,] &quot;k__Bacteria&quot; &quot;p__Proteobacteria&quot; &quot;c__Gammaproteobacteria&quot;
+## [3,] &quot;k__Bacteria&quot; &quot;p__Firmicutes&quot;     &quot;c__Bacilli&quot;            
+## [4,] &quot;k__Bacteria&quot; &quot;p__Proteobacteria&quot; &quot;c__Alphaproteobacteria&quot;
+## [5,] &quot;k__Bacteria&quot; &quot;p__Proteobacteria&quot; &quot;c__Gammaproteobacteria&quot;
+## [6,] &quot;k__Bacteria&quot; &quot;p__[Thermi]&quot;       &quot;c__Deinococci&quot;         
+##      [,4]                   [,5]                    [,6]               
+## [1,] &quot;o__Bacillales&quot;        &quot;f__Staphylococcaceae&quot;  &quot;g__Staphylococcus&quot;
+## [2,] &quot;o__Pseudomonadales&quot;   &quot;f__Moraxellaceae&quot;      &quot;g__Acinetobacter&quot; 
+## [3,] &quot;o__Lactobacillales&quot;   &quot;f__Streptococcaceae&quot;   &quot;g__Streptococcus&quot; 
+## [4,] &quot;o__Rhodobacterales&quot;   &quot;f__Rhodobacteraceae&quot;   &quot;g__Rhodobacter&quot;   
+## [5,] &quot;o__Enterobacteriales&quot; &quot;f__Enterobacteriaceae&quot; &quot;g__Escherichia&quot;   
+## [6,] &quot;o__Deinococcales&quot;     &quot;f__Deinococcaceae&quot;     &quot;g__Deinococcus&quot;   
+##      [,7]            
+## [1,] &quot;s__&quot;           
+## [2,] &quot;s__guillouiae&quot; 
+## [3,] &quot;s__&quot;           
+## [4,] &quot;s__sphaeroides&quot;
+## [5,] &quot;s__coli&quot;       
+## [6,] &quot;s__&quot;</code></pre>
 <p>Since we used the green genes database there are some assignments which are actually empty such as the “s__&quot; species. We will convert them to their correct NA value.</p>
 <pre class="r"><code>taxa[grep(&quot;__$&quot;, taxa)] &lt;- NA</code></pre>
 <p>The taxa assignments can be combined with quantifications using the phyloseq package.</p>
@@ -494,31 +510,24 @@ head(unname(taxa))</code></pre>
                tax_table(taxa))</code></pre>
 <p>We can now compare this table to our reference table from mockrobiota. We will start by quantifying how many of the real taxa were found in our taxonomy assignment.</p>
 <pre class="r"><code>taxa_metrics(tax_table(ps), tax_table(mock$ps_gg))</code></pre>
-<pre><code>##     level precision     recall        F1 n_exp n_ref
-## 1 Kingdom         1 0.50000000 0.6666667     1     2
-## 2  Phylum         1 0.16666667 0.2857143     1     6
-## 3   Class         1 0.10000000 0.1818182     1    10
-## 4   Order         1 0.08333333 0.1538462     1    12
-## 5  Family         1 0.05555556 0.1052632     1    18
-## 6   Genus         1 0.05555556 0.1052632     1    18
-## 7 Species       NaN 0.00000000       NaN     0    20</code></pre>
+<pre><code>##     level precision recall        F1 n_exp n_ref
+## 1 Kingdom 1.0000000   1.00 1.0000000     2     2
+## 2  Phylum 0.8571429   1.00 0.9230769     7     6
+## 3   Class 0.8333333   1.00 0.9090909    12    10
+## 4   Order 0.7058824   1.00 0.8275862    17    12
+## 5  Family 0.6923077   1.00 0.8181818    26    18
+## 6   Genus 0.6923077   1.00 0.8181818    26    18
+## 7 Species 0.4666667   0.35 0.4000000    15    20</code></pre>
 <p>As we can see we are pretty good in identifying the taxa in our samples. However, how do we perform in terms of taxa quantities? We will start by stratifying across the samples:</p>
 <pre class="r"><code>tq &lt;- taxa_quants(ps, mock$ps_gg, normalize = TRUE)
 head(tq)</code></pre>
-<pre><code>##     level                        name                 sample measured
-## 1 Kingdom                  k__Archaea      HMPMockV1.1.Even1        1
-## 2 Kingdom                  k__Archaea      HMPMockV1.1.Even2        0
-## 3 Kingdom                  k__Archaea HMPMockV1.2.Staggered1        0
-## 4 Kingdom                  k__Archaea HMPMockV1.2.Staggered2        0
-## 5  Phylum k__Archaea;p__Euryarchaeota      HMPMockV1.1.Even1        1
-## 6  Phylum k__Archaea;p__Euryarchaeota      HMPMockV1.1.Even2        0
-##    reference
-## 1 0.04761905
-## 2 0.04761905
-## 3 0.21436227
-## 4 0.21436227
-## 5 0.04761905
-## 6 0.04761905</code></pre>
+<pre><code>##     level        name                 sample    measured  reference
+## 1 Kingdom k__Bacteria      HMPMockV1.1.Even1 0.952838345 0.95238095
+## 2 Kingdom  k__Archaea      HMPMockV1.1.Even1 0.018463343 0.04761905
+## 3 Kingdom k__Bacteria      HMPMockV1.1.Even2 0.982687224 0.95238095
+## 4 Kingdom  k__Archaea      HMPMockV1.1.Even2 0.001397180 0.04761905
+## 5 Kingdom k__Bacteria HMPMockV1.2.Staggered1 0.982101106 0.78563773
+## 6 Kingdom  k__Archaea HMPMockV1.2.Staggered1 0.001579063 0.21436227</code></pre>
 <p><code>taxa_quants</code> already quantifies across a possible levels of taxonomy. So we can plot the performance stratified by sample with</p>
 <pre class="r"><code>ggplot(tq, aes(x=reference, y=measured, col=level)) +
     geom_abline(alpha=0.5) +
@@ -541,13 +550,13 @@ head(tq)</code></pre>
 ##  Pearson&#39;s product-moment correlation
 ## 
 ## data:  tq$measured and tq$reference
-## t = -3.3166, df = 22, p-value = 0.003136
+## t = 27.112, df = 290, p-value &lt; 2.2e-16
 ## alternative hypothesis: true correlation is not equal to 0
 ## 95 percent confidence interval:
-##  -0.7954790 -0.2267681
+##  0.8108459 0.8764111
 ## sample estimates:
-##        cor 
-## -0.5773503</code></pre>
+##      cor 
+## 0.846815</code></pre>
 <p>So we get a correlation of about 0.85 which is okay for the bad quality reads we used here.</p>
 </div>
 

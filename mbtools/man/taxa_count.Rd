@@ -2,20 +2,20 @@
 % Please edit documentation in R/mangling.R
 \name{taxa_count}
 \alias{taxa_count}
-\title{Count reads across a taxonomy level.}
+\title{Counts the reads for a specific taxonomy level.}
 \usage{
 taxa_count(ps, lev = "Genus")
 }
 \arguments{
 \item{ps}{A phyloseq object.}
 
-\item{lev}{The taxonomy level to count.}
+\item{lev}{The taxonomy level at which to count.}
 }
 \value{
-A mbquant data table with the taxa counts in long format.
+A mbquant data table containing the counts in "long" format.
 }
 \description{
-Count reads across a taxonomy level.
+Counts the reads for a specific taxonomy level.
 }
 \examples{
  NULL

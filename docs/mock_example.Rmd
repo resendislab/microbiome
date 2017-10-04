@@ -84,8 +84,10 @@ are acceptable up to 100 bp.
 dir.create("filtered")
 fwd_filt <- file.path("filtered", basename(fwd))
 bwd_filt <- file.path("filtered", basename(bwd))
-filterAndTrim(fwd, fwd_filt, bwd, bwd_filt, truncLen=c(150, 100),
-              compress=T, verbose=T, multithread=T)
+filt <- filterAndTrim(fwd, fwd_filt, bwd, bwd_filt,
+                      trimLeft=10, truncLen=c(140, 100),
+                      compress=T, multithread=T)
+filt
 ```
 
 We will follow by dereplicating the reads which will yield the unique
@@ -125,7 +127,9 @@ data set that there is no sufficient overlap. Thus, we will treat the forward an
 backward reads independently.
 
 ```{r}
-seqtab <- makeSequenceTable(mergePairs(dadaFs, derepFs, dadaRs, derepRs))
+seqtab_fwd <- makeSequenceTable(dadaFs)
+seqtab_bwd <- makeSequenceTable(dadaRs)
+seqtab <- cbind(seqtab_fwd, seqtab_bwd)
 ```
 
 Finally, we will also remove bimeras (reads that are combinations of two other
@@ -152,7 +156,7 @@ if (!file.exists("gg_138.fa.gz"))
 Taxonomies can now be assigned by
 
 ```{r}
-taxa <- assignTaxonomy(seqtab_nochim, "gg_138.fa.gz")
+taxa <- assignTaxonomy(seqtab_nochim, "gg_138.fa.gz", multithread=TRUE)
 colnames(taxa) <- c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
 head(unname(taxa))
 ```
