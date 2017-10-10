@@ -4,7 +4,8 @@
 
 #' Convert a mbquant data table to a matrix.
 #'
-#' @param long_data the mbquant data table.
+#' @param x the mbquant data table.
+#' @param ... additional arguments.
 #' @return A matrix with samples on the rows and taxa on the columns.
 #' @examples
 #'  NULL
@@ -12,8 +13,8 @@
 #' @export
 #' @importFrom phyloseq otu_table tax_table
 #' @importFrom data.table dcast rbindlist
-as.matrix.mbquant <- function(long_data) {
-    mat <- dcast(long_data, sample ~ taxa, value.var = "reads")
+as.matrix.mbquant <- function(x, ...) {
+    mat <- dcast(x, sample ~ taxa, value.var = "reads")
     samples <- mat[, sample]
     mat <- as.matrix(mat[, !"sample"])
     rownames(mat) <- samples
@@ -103,6 +104,7 @@ discretize <- function(df, groups = 3) {
 #'  NULL
 #'
 #' @export
+#' @importFrom stats sd
 standardize <- function(df) {
     for (col in names(df)) {
         if (is.numeric(df[[col]])) {

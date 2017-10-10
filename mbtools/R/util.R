@@ -37,17 +37,18 @@ sra_files <- function(path) {
 #'  Those do not sum up to one since there is also a remaining probability to
 #'  observe a new event given as p(new) = 1 - sum(p).
 #' @examples
-#'  x <- sample(1:10, 100, replace=T)
+#'  x <- sample(1:10, 100, replace=TRUE)
 #'  p <- orlitsky(x)
 #' @export
 orlitsky <- function(counts) {
-    n <- length(data)
-    phi <- c(tabulate(data), 0) # the prevalences, denoted by phi
+    n <- length(counts)
+    phi <- c(tabulate(counts), 0) # the prevalences, denoted by phi
     cn <- ceiling((n+1)^1/3)    # a smoothing factor for the prevalences
     new <- max(cn, phi[1] + 1)
-    probs <- (data + 1) * pmax(cn, phi[data + 1] + 1) / pmax(cn, phi[data])
-    if (hasnames(probs)) {
-        names(probs) <- names(data)
+    probs <- (counts + 1) * pmax(cn, phi[counts + 1] + 1) /
+             pmax(cn, phi[counts])
+    if (!is.null(names(counts))) {
+        names(probs) <- names(counts)
     }
-    return(probs/sum(c(probs, new)))
+    return(probs / sum(c(probs, new)))
 }

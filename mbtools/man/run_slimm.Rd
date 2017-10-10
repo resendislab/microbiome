@@ -10,6 +10,9 @@ run_slimm(alignments, slimm_db, reports = NULL)
 \item{alignments}{A data frame as output by \code{\link{align_bowtie2}}}
 
 \item{slimm_db}{Path for the SLIMM data base.}
+
+\item{reports}{Path where to save the SLIMM reports. Uses a temporary
+directory by default.}
 }
 \value{
 Path to the slimm output.

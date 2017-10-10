@@ -4,10 +4,12 @@
 \alias{as.matrix.mbquant}
 \title{Convert a mbquant data table to a matrix.}
 \usage{
-\method{as.matrix}{mbquant}(long_data)
+\method{as.matrix}{mbquant}(x, ...)
 }
 \arguments{
-\item{long_data}{the mbquant data table.}
+\item{x}{the mbquant data table.}
+
+\item{...}{additional arguments.}
 }
 \value{
 A matrix with samples on the rows and taxa on the columns.

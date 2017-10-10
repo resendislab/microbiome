@@ -111,6 +111,8 @@ align_bowtie2 <- function(reads, index_basename, threads=1,
 #'
 #' @param alignments A data frame as output by \code{\link{align_bowtie2}}
 #' @param slimm_db Path for the SLIMM data base.
+#' @param reports Path where to save the SLIMM reports. Uses a temporary
+#'  directory by default.
 #' @return Path to the slimm output.
 #' @examples
 #'  NULL
