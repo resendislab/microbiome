@@ -12,7 +12,7 @@
 #'
 #' @export
 #' @importFrom phyloseq otu_table tax_table
-#' @importFrom data.table dcast rbindlist
+#' @importFrom data.table dcast rbindlist as.data.table melt
 as.matrix.mbquant <- function(x, ...) {
     mat <- dcast(x, sample ~ taxa, value.var = "reads")
     samples <- mat[, sample]
@@ -24,7 +24,8 @@ as.matrix.mbquant <- function(x, ...) {
 #' Counts the reads for a specific taxonomy level.
 #'
 #' @param ps A phyloseq object.
-#' @param lev The taxonomy level at which to count.
+#' @param lev The taxonomy level at which to count. If NA uses the finest level
+#'  available (individual sequences).
 #' @return A mbquant data table containing the counts in "long" format.
 #' @examples
 #'  NULL
@@ -36,16 +37,23 @@ taxa_count <- function(ps, lev = "Genus") {
         otus <- t(otus)
     }
     taxonomy <- as(tax_table(ps), "matrix")
-    ilev <- which(colnames(taxonomy) == lev)
-    taxa <- factor(apply(taxonomy, 1, "[", ilev))
 
-    counts <- tapply(1:length(taxa), taxa, function(idx) {
-        sums <- rowSums(otus[, idx, drop = FALSE])
-        data.table(sample = sample_names(ps),
-                   taxa = taxa[idx[1]],
-                   reads = sums)
-    }, simplify = FALSE)
-    counts <- rbindlist(counts)
+    if (is.na(lev)) {
+        counts <- as.data.table(otus, keep.rownames = TRUE)
+        counts <- melt(counts, id.vars = "rn")
+        names(counts) <- c("sample", "taxa", "reads")
+    } else {
+        ilev <- which(colnames(taxonomy) == lev)
+        taxa <- factor(apply(taxonomy, 1, "[", ilev))
+
+        counts <- tapply(1:length(taxa), taxa, function(idx) {
+            sums <- rowSums(otus[, idx, drop = FALSE])
+            data.table(sample = sample_names(ps),
+                    taxa = taxa[idx[1]],
+                    reads = sums)
+        }, simplify = FALSE)
+        counts <- rbindlist(counts)
+    }
     class(counts) <- c("mbquant", class(counts))
 
     return(counts)

@@ -9,7 +9,8 @@ taxa_count(ps, lev = "Genus")
 \arguments{
 \item{ps}{A phyloseq object.}
 
-\item{lev}{The taxonomy level at which to count.}
+\item{lev}{The taxonomy level at which to count. If NA uses the finest level
+available (individual sequences).}
 }
 \value{
 A mbquant data table containing the counts in "long" format.
