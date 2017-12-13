@@ -1,6 +1,6 @@
 Package: mbtools
 Title: Provides helper functions for microbiome preprocessing and analysis
-Version: 0.6.1
+Version: 0.7.0
 Authors@R: person("First", "Last", email = "mail@cdiener.com", role = c("aut", "cre"))
 Description: Provides helper functions for microbiome preprocessing and
     analysis.
@@ -8,6 +8,8 @@ Depends:
     R (>= 3.3.0)
 Imports:
     Biostrings,
+    DESeq2,
+    IHW,
     ShortRead,
     pbapply,
     phyloseq,
@@ -19,12 +21,12 @@ Imports:
     R.utils,
     Hmisc,
     data.table,
-    yaml
+    yaml,
+    magrittr
 License: Apache License (== 2.0)
 Encoding: UTF-8
 LazyData: true
 Suggests:
     testthat,
-    covr,
-    magrittr
+    covr
 RoxygenNote: 6.0.1

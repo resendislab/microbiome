@@ -10,7 +10,7 @@
 NULL
 
 pkgs <- c("ggplot2", "dada2", "phyloseq", "msa", "phangorn", "ShortRead",
-          "data.table", "yaml")
+          "data.table", "yaml", "magrittr")
 
 silent_lib <- function(...) suppressPackageStartupMessages(library(...))
 

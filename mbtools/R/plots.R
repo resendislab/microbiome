@@ -16,6 +16,7 @@
 #'  NULL
 #'
 #' @export
+#' @importFrom ggplot2 ggplot geom_boxplot facet_wrap scale_y_log10 xlab
 plot_counts <- function(dds, variable, taxa = NULL,
                         normalized = TRUE, pc = 0.5, only_data = FALSE) {
     cn <- counts(dds, normalized = normalized)
