@@ -9,7 +9,6 @@ Depends:
 Imports:
     Biostrings,
     DESeq2,
-    IHW,
     ShortRead,
     pbapply,
     phyloseq,
@@ -28,5 +27,6 @@ Encoding: UTF-8
 LazyData: true
 Suggests:
     testthat,
-    covr
+    covr,
+    IHW
 RoxygenNote: 6.0.1
