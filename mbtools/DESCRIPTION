@@ -8,6 +8,7 @@ Depends:
     R (>= 3.3.0)
 Imports:
     Biostrings,
+    GenomicAlignments,
     DESeq2,
     ShortRead,
     pbapply,

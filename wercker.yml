@@ -1,6 +1,11 @@
 box: rocker/hadleyverse
 build:
     steps:
+        - script:
+            name: install alignment tools
+            code: |
+                apt-get update
+                apt-get install -y -no-install-recommends bowtie2 samtools
         - jimhester/r-dependencies:
             cwd: mbtools
         - inbobmk/r-check:
