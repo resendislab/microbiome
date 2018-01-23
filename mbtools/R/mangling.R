@@ -21,6 +21,18 @@ as.matrix.mbquant <- function(x, ...) {
     return(mat)
 }
 
+
+species_names <- function(taxonomy) {
+    ilev <- which(tolower(colnames(taxonomy)) == "species")
+    species <- taxonomy[, ilev]
+    genus <- taxonomy[, ilev - 1]
+    species[!is.na(genus)] <- paste(genus[!is.na(genus)],
+                                    species[!is.na(genus)])
+    names(species) <- rownames(taxonomy)
+    return(species)
+}
+
+
 #' Counts the reads for a specific taxonomy level.
 #'
 #' @param ps A phyloseq object.
@@ -42,9 +54,15 @@ taxa_count <- function(ps, lev = "Genus") {
         counts <- as.data.table(otus, keep.rownames = TRUE)
         counts <- melt(counts, id.vars = "rn")
         names(counts) <- c("sample", "taxa", "reads")
+        counts[, "species" := species_names(taxonomy)[taxa]]
     } else {
-        ilev <- which(colnames(taxonomy) == lev)
-        taxa <- factor(apply(taxonomy, 1, "[", ilev))
+        ilev <- which(tolower(colnames(taxonomy)) == tolower(lev))
+        if (tolower(lev) == "species") {
+            taxa <- species_names(taxonomy)
+        } else {
+            taxa <- taxonomy[, ilev]
+        }
+        taxa <- factor(taxa)
 
         counts <- tapply(1:length(taxa), taxa, function(idx) {
             sums <- rowSums(otus[, idx, drop = FALSE])
