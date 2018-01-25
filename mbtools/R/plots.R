@@ -40,10 +40,22 @@ plot_counts <- function(dds, variable, taxa = NULL,
 }
 
 
+shorten <- function(texts, n=40) {
+    before <- sapply(texts, nchar)
+    texts <- substr(texts, 1, n)
+    after <- sapply(texts, nchar)
+    texts[before > after] <- paste0(texts[before > after], "...")
+    return(texts)
+}
+
+
 plot_taxa <- function(ps, level="Phylum", sort=TRUE,
                       max_taxa = 12, only_data = FALSE) {
     counts <- taxa_count(ps, lev=level)[, reads := as.double(reads)]
     counts[, reads := reads / sum(reads), by = "sample"]
+    if (is.na(level)) {
+        counts[, taxa := paste0(species, ": ", taxa)]
+    }
     total_ord <- counts[, sum(reads, na.rm=TRUE), by = "taxa"][order(-V1), taxa]
     if (length(total_ord) > max_taxa) {
         total_ord <- total_ord[1:max_taxa]
@@ -60,7 +72,8 @@ plot_taxa <- function(ps, level="Phylum", sort=TRUE,
         geom_bar(stat="identity", col=NA) +
         scale_x_continuous(expand = c(0, 1)) +
         scale_y_continuous(expand = c(0, 0.01)) +
-        scale_fill_brewer(palette="Paired", direction = -1) +
+        scale_fill_brewer(palette="Paired", direction = -1, label=shorten) +
+        xlab("sample index") + ylab("% of reads") + labs(fill="") +
         theme_bw()
 
     return(pl)
