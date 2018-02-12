@@ -32,7 +32,7 @@ plot_counts <- function(dds, variable, taxa = NULL,
     dts <- rbindlist(dts)
     if (only_data) return(dts)
 
-    pl <- ggplot(dts, aes(x = value, y = counts + pc, fill = value)) +
+    pl <- ggplot(dts, aes(x = value, y = counts + pc, group=value)) +
           geom_boxplot() + facet_wrap(~ taxa) + scale_y_log10() +
           xlab(variable)
 
@@ -69,7 +69,7 @@ plot_taxa <- function(ps, level="Phylum", sort=TRUE,
     if (only_data) return(counts)
 
     pl <- ggplot(counts, aes(x=id, y=reads, fill=taxa)) +
-        geom_bar(stat="identity", col=NA) +
+        geom_bar(stat="identity", col=NA, width=1) +
         scale_x_continuous(expand = c(0, 1)) +
         scale_y_continuous(expand = c(0, 0.01)) +
         scale_fill_brewer(palette="Paired", direction = -1, label=shorten) +
