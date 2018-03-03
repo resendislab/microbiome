@@ -1,4 +1,4 @@
-box: rocker/hadleyverse
+box: rocker/tidyverse
 build:
     steps:
         - script:

@@ -5,6 +5,8 @@
 #' factors.
 #'
 #' @param ps A phyloseq object containing the taxa counts.
+#' @param variables Names of exogenous variables to include. Defaults to all
+#'  variables.
 #' @param tax The taxa level on which to run differential tests. Defaults to
 #'  genus.
 #' @param confounders A character vector containing the confounders that should
@@ -20,9 +22,10 @@
 #'  NULL
 #'
 #' @export
+#' @importFrom data.table set
 #' @importFrom phyloseq sample_data
 #' @importFrom DESeq2 DESeqDataSetFromMatrix DESeq results lfcShrink
-#' @importFrom IHW ihw adj_pvalues
+#'  resultsNames estimateSizeFactors
 association <- function(ps, variables = NULL, tax = "genus",
                         confounders = NULL, min_count = 10, in_samples = 0.1,
                         independent_weighting = TRUE, shrink = TRUE) {
@@ -30,6 +33,9 @@ association <- function(ps, variables = NULL, tax = "genus",
         missing_conf <- apply(sample_data(ps)[, confounders], 1,
                               function(row) any(is.na(row)))
         ps <- prune_samples(!missing_conf, ps)
+    }
+    if (!requireNamespace("IHW", quietly = TRUE)) {
+        stop("independent weighting requires the IHW package!")
     }
     meta <- as(sample_data(ps), "data.frame")
     if (is.null(variables)) variables = names(meta)
@@ -90,8 +96,8 @@ association <- function(ps, variables = NULL, tax = "genus",
 
     if (length(variables) > 1) {
         if (independent_weighting) {
-            weights <- ihw(pvalue ~ baseMean, tests, alpha = 0.05)
-            set(tests, j = "padj", value = adj_pvalues(weights))
+            weights <- IHW::ihw(pvalue ~ baseMean, tests, alpha = 0.05)
+            set(tests, j = "padj", value = IHW::adj_pvalues(weights))
         } else {
             set(tests, j = "padj", value =
                 p.adjust(tests$pvalues, method = "BH"))
@@ -125,8 +131,6 @@ association <- function(ps, variables = NULL, tax = "genus",
 #' @importFrom stats glm p.adjust influence reformulate
 #' @importFrom utils combn
 #' @importFrom phyloseq sample_data
-#' @importFrom DESeq2 DESeqDataSetFromMatrix DESeq results lfcShrink
-#' @importFrom IHW ihw adj_pvalues
 combinatorial_association <- function(ps, variable, tax = "genus",
                         confounders = NULL, min_count = 10, in_samples = 0.1,
                         independent_weighting = TRUE, shrink = TRUE) {
@@ -134,6 +138,9 @@ combinatorial_association <- function(ps, variable, tax = "genus",
         missing_conf <- apply(sample_data(ps)[, confounders], 1,
                               function(row) any(is.na(row)))
         ps <- prune_samples(!missing_conf, ps)
+    }
+    if (!requireNamespace("IHW", quietly = TRUE)) {
+        stop("independent weighting requires the IHW package!")
     }
     meta <- as(sample_data(ps), "data.frame")
     if (!is.factor(meta[[variable]])) {
@@ -178,8 +185,11 @@ combinatorial_association <- function(ps, variable, tax = "genus",
     tests <- rbindlist(tests)
 
     if (independent_weighting) {
-        weights <- ihw(pvalue ~ baseMean, tests, alpha = 0.05)
-        set(tests, j = "padj", value = adj_pvalues(weights))
+        if (!requireNamespace("IHW", quietly = TRUE)) {
+            stop("independent weighting requires the IHW package!")
+        }
+        weights <- IHW::ihw(pvalue ~ baseMean, tests, alpha = 0.05)
+        set(tests, j = "padj", value = IHW::adj_pvalues(weights))
     } else {
         set(tests, j = "padj", value = p.adjust(tests$pvalues, method = "BH"))
     }

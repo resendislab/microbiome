@@ -12,6 +12,9 @@ association(ps, variables = NULL, tax = "genus", confounders = NULL,
 \arguments{
 \item{ps}{A phyloseq object containing the taxa counts.}
 
+\item{variables}{Names of exogenous variables to include. Defaults to all
+variables.}
+
 \item{tax}{The taxa level on which to run differential tests. Defaults to
 genus.}
 
