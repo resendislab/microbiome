@@ -7,7 +7,7 @@ factors.}
 \usage{
 association(ps, variables = NULL, tax = "genus", confounders = NULL,
   min_count = 10, in_samples = 0.1, independent_weighting = TRUE,
-  shrink = TRUE)
+  standardize = TRUE, shrink = TRUE)
 }
 \arguments{
 \item{ps}{A phyloseq object containing the taxa counts.}
@@ -28,6 +28,11 @@ be used.}
 \item{independent_weighting}{Whether to adjust p values by independent
 weighting or normal Benjamini-Hochberg.
 factors.}
+
+\item{standardize}{Whether to standardize continuous variables to a mean
+of zero and a variance of 1. If True log fold changes for those variables
+denote are relative to a change of one standard deviation in the variable
+value.}
 
 \item{shrink}{Whether to return shrunken log fold changes. Defaults to true.}
 }

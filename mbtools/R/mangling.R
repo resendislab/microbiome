@@ -77,6 +77,42 @@ taxa_count <- function(ps, lev = "Genus") {
     return(counts)
 }
 
+#' Normalize a set of read counts across samples
+#'
+#' Uses DESeq2's size factor estimation.
+#'
+#' @param counts A count matrix with samples as rows or mbquant object.
+#' @param method The method to use. Defaults to "poscounts".
+#' @return An object containing normlized read counts.
+#' @examples
+#'  NULL
+#'
+#' @export
+#' @importFrom DESeq2 DESeqDataSetFromMatrix estimateSizeFactors sizeFactors
+normalize <- function(counts, method="poscounts") {
+    is_matrix <- "matrix" %in% class(counts)
+    if (is_matrix) {
+        cmat <- counts
+    } else {
+        if ("mbquant" %in% class(counts)) {
+            cmat <- as.matrix(counts)
+        } else {
+            stop("`counts` must be a matrix or mquant object.")
+        }
+    }
+    dds <- DESeqDataSetFromMatrix(t(cmat), data.frame(name = rownames(cmat)),
+                                   design = ~1)
+    dds <- estimateSizeFactors(dds, type = method)
+    sfs <- sizeFactors(dds)
+
+    if (is_matrix) {
+        counts <- counts / sfs
+    } else {
+        counts$reads <- counts$reads / sfs[counts$sample]
+    }
+
+    return(counts)
+}
 
 #' Applies the specified types to a data frame-like object.
 #'

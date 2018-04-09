@@ -4,9 +4,11 @@
 
 #' Plots counts for several taxa across a co-variable
 #'
-#' @param dds A DESeq2 data set.
+#' @param ps A phyloseq data set.
 #' @param variable The name of the co-variable.
-#' @param taxa A character vector denoting the taxa to be plotted.
+#' @param tax_level The taxonomy level to use. Defaults to genus.
+#' @param taxa A character vector denoting the taxa to be plotted. Defaults
+#'  to plotting all taxa.
 #' @param normalized Whether to normalize the counts using the DESeq2 size
 #'  factors.
 #' @param pc The pseudo count to add.
@@ -17,24 +19,32 @@
 #'
 #' @export
 #' @importFrom ggplot2 ggplot geom_boxplot facet_wrap scale_y_log10 xlab
-plot_counts <- function(dds, variable, taxa = NULL,
+plot_counts <- function(ps, variable, tax_level = "genus", taxa = NULL,
                         normalized = TRUE, pc = 0.5, only_data = FALSE) {
-    cn <- counts(dds, normalized = normalized)
-
-    if (is.null(taxa)) {
-        taxa <- rownames(cn)
+    dts <- taxa_count(ps, lev = tax_level)
+    valid_taxa <- taxa
+    if (normalized) {
+        dts <- normalize(dts)
     }
 
-    dts <- lapply(taxa, function(ta) {
-        data.table(counts = cn[ta, ], variable = variable,
-                   value = dds[[variable]], taxa = ta)
-    })
-    dts <- rbindlist(dts)
+    if (is.null(taxa)) {
+        taxa <- unique(dts[[tax_level]])
+    }
+
+    dts <- dts[taxa %in% valid_taxa]
+    dts$variable <- variable
+    dts$value <- sample_data(ps)[dts$sample, variable]
     if (only_data) return(dts)
 
-    pl <- ggplot(dts, aes(x = value, y = counts + pc, group=value)) +
-          geom_boxplot() + facet_wrap(~ taxa) + scale_y_log10() +
-          xlab(variable)
+    if (is.integer(dts$value) || is.factor(dts$value)) {
+        pl <- ggplot(dts, aes(x = value, y = reads + pc, group = value)) +
+              geom_boxplot() + facet_wrap(~ taxa) + scale_y_log10() +
+              xlab(variable)
+    } else {
+        pl <- ggplot(dts, aes(x = value, y = reads + pc)) +
+              geom_point(alpha = 0.5) + facet_wrap(~ taxa) + scale_y_log10() +
+              xlab(variable)
+    }
 
     return(pl)
 }

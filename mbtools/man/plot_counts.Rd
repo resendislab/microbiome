@@ -4,15 +4,18 @@
 \alias{plot_counts}
 \title{Plots counts for several taxa across a co-variable}
 \usage{
-plot_counts(dds, variable, taxa = NULL, normalized = TRUE, pc = 0.5,
-  only_data = FALSE)
+plot_counts(ps, variable, tax_level = "genus", taxa = NULL,
+  normalized = TRUE, pc = 0.5, only_data = FALSE)
 }
 \arguments{
-\item{dds}{A DESeq2 data set.}
+\item{ps}{A phyloseq data set.}
 
 \item{variable}{The name of the co-variable.}
 
-\item{taxa}{A character vector denoting the taxa to be plotted.}
+\item{tax_level}{The taxonomy level to use. Defaults to genus.}
+
+\item{taxa}{A character vector denoting the taxa to be plotted. Defaults
+to plotting all taxa.}
 
 \item{normalized}{Whether to normalize the counts using the DESeq2 size
 factors.}

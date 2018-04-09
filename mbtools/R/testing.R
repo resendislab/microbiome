@@ -16,6 +16,10 @@
 #' @param independent_weighting Whether to adjust p values by independent
 #'  weighting or normal Benjamini-Hochberg.
 #'  factors.
+#' @param standardize Whether to standardize continuous variables to a mean
+#'  of zero and a variance of 1. If True log fold changes for those variables
+#'  denote are relative to a change of one standard deviation in the variable
+#'  value.
 #' @param shrink Whether to return shrunken log fold changes. Defaults to true.
 #' @return A data.table containing the results.
 #' @examples
@@ -28,7 +32,8 @@
 #'  resultsNames estimateSizeFactors
 association <- function(ps, variables = NULL, tax = "genus",
                         confounders = NULL, min_count = 10, in_samples = 0.1,
-                        independent_weighting = TRUE, shrink = TRUE) {
+                        independent_weighting = TRUE, standardize = TRUE,
+                        shrink = TRUE) {
     if (!is.null(confounders)) {
         missing_conf <- apply(sample_data(ps)[, confounders], 1,
                               function(row) any(is.na(row)))
@@ -38,7 +43,8 @@ association <- function(ps, variables = NULL, tax = "genus",
         stop("independent weighting requires the IHW package!")
     }
     meta <- as(sample_data(ps), "data.frame")
-    if (is.null(variables)) variables = names(meta)
+    if (standardize) meta <- standardize(meta)
+    if (is.null(variables)) variables <- names(meta)
     variables <- variables[!(variables %in% confounders)]
     counts <- as.matrix(taxa_count(ps, lev = tax))
     meta <- meta[rownames(counts), ]
@@ -67,8 +73,8 @@ association <- function(ps, variables = NULL, tax = "genus",
             mod <- glm(reformulate(c(confounders, v), "totals"),
                        data = meta[good, ])
             infl <- influence(mod)
-            expected <- (length(confounders) + 2) / sum(good)
-            outliers <- any(infl$hat > expected * 8)
+            expected <- sum(infl$hat) / sum(good)
+            outliers <- any(infl$hat > (expected * 10))
         } else {
             outliers <- FALSE
         }
@@ -122,18 +128,24 @@ association <- function(ps, variables = NULL, tax = "genus",
 #' @param independent_weighting Whether to adjust p values by independent
 #'  weighting or normal Benjamini-Hochberg.
 #'  factors.
+#' @param standardize Whether to standardize continuous variables to a mean
+#'  of zero and a variance of 1. If True log fold changes for those variables
+#'  denote are relative to a change of one standard deviation in the variable
+#'  value.
 #' @param shrink Whether to return shrunken log fold changes. Defaults to true.
 #' @return A data.table containing the results.
 #' @examples
 #'  NULL
 #'
 #' @export
+#' @importFrom data.table set
 #' @importFrom stats glm p.adjust influence reformulate
 #' @importFrom utils combn
 #' @importFrom phyloseq sample_data
 combinatorial_association <- function(ps, variable, tax = "genus",
                         confounders = NULL, min_count = 10, in_samples = 0.1,
-                        independent_weighting = TRUE, shrink = TRUE) {
+                        independent_weighting = TRUE, standardize = TRUE,
+                        shrink = TRUE) {
     if (!is.null(confounders)) {
         missing_conf <- apply(sample_data(ps)[, confounders], 1,
                               function(row) any(is.na(row)))
@@ -143,6 +155,7 @@ combinatorial_association <- function(ps, variable, tax = "genus",
         stop("independent weighting requires the IHW package!")
     }
     meta <- as(sample_data(ps), "data.frame")
+    if (standardize) meta <- standardize(meta)
     if (!is.factor(meta[[variable]])) {
         stop("variable must be a factor.")
     }
