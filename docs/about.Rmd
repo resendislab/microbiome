@@ -1,9 +1,0 @@
----
-title: "About"
----
-
-## R session info
-
-```{r}
-sessionInfo()
-```
