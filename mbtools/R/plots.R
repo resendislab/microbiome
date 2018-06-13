@@ -27,8 +27,8 @@ plot_counts <- function(ps, variable, tax_level = "genus", taxa = NULL,
         dts <- normalize(dts)
     }
 
-    if (is.null(taxa)) {
-        taxa <- unique(dts[[tax_level]])
+    if (is.null(valid_taxa)) {
+        valid_taxa <- unique(dts[["taxa"]])
     }
 
     dts <- dts[taxa %in% valid_taxa]
@@ -58,7 +58,9 @@ shorten <- function(texts, n=40) {
     return(texts)
 }
 
-
+#' Plot relative taxa abundances
+#'
+#' @export
 plot_taxa <- function(ps, level="Phylum", sort=TRUE,
                       max_taxa = 12, only_data = FALSE) {
     counts <- taxa_count(ps, lev=level)[, reads := as.double(reads)]

@@ -55,6 +55,7 @@ association <- function(ps, variables = NULL, tax = "genus",
     log_file <- tempfile("mbtools", fileext = ".log")
     cat(paste("Writing logs to", log_file))
     sink(file(log_file, open = "wt"), type = "message")
+    on.exit(sink(type = "message"))
     tests <- pblapply(variables, function(v) {
         good <- !is.na(meta[[v]])
         is_reg = !is.factor(meta[[v]])
@@ -63,11 +64,16 @@ association <- function(ps, variables = NULL, tax = "genus",
         } else {
             ref_model <- reformulate(confounders)
         }
+        if (ncol(counts) < 50) {
+            fit_type <- "mean"
+        } else {
+            fit_type <- "local"
+        }
         dds <- DESeqDataSetFromMatrix(t(counts[good, ]), meta[good, ],
             design = reformulate(c(confounders, v)))
         dds <- estimateSizeFactors(dds, type = "poscount")
         dds <- DESeq(dds, test = "LRT", parallel = TRUE, quiet = TRUE,
-                     fitType = "local", reduced = ref_model)
+                     fitType = fit_type, reduced = ref_model)
         if (is_reg) {
             totals <- colSums(counts(dds))
             mod <- glm(reformulate(c(confounders, v), "totals"),
@@ -97,7 +103,6 @@ association <- function(ps, variables = NULL, tax = "genus",
         set(res, j = "n_eff", value = n)
         return(res)
     })
-    sink(type = "message")
     tests <- rbindlist(tests)
 
     if (length(variables) > 1) {

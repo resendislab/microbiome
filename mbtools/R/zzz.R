@@ -9,7 +9,7 @@
 #' @importFrom R.utils gunzip
 NULL
 
-pkgs <- c("ggplot2", "dada2", "phyloseq", "msa", "phangorn", "ShortRead",
+pkgs <- c("ggplot2", "dada2", "phyloseq", "ShortRead",
           "data.table", "yaml", "magrittr")
 
 silent_lib <- function(...) suppressPackageStartupMessages(library(...))
