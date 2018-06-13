@@ -1,13 +1,8 @@
 Package: mbtools
 Title: Provides helper functions for microbiome preprocessing and analysis
-<<<<<<< HEAD
 Version: 0.9.1
-Authors@R: person("First", "Last", email = "mail@cdiener.com", role = c("aut", "cre")))
-=======
-Version: 0.9.0
 Authors@R: c(person("Christian", "Diener", email = "mail[at]cdiener.com", role = c("aut", "cre")),
-             person("Osbaldo", "Resendis-Antonio", email = "resendis[at]inmegen.gob.mx", role = "ldr"))
->>>>>>> a7ed75924942c5c6732d989b6120063caa98656c
+             person("Osbaldo", "Resendis-Antonio", email = "resendis[at]inmegen.gob.mx", role = "ldr")))
 Description: Provides helper functions for microbiome preprocessing and
     analysis.
 Depends:
@@ -19,8 +14,6 @@ Imports:
     ShortRead,
     pbapply,
     phyloseq,
-    phangorn,
-    msa,
     dada2,
     ggplot2,
     stringr,
