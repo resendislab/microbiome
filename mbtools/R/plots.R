@@ -58,7 +58,18 @@ shorten <- function(texts, n=40) {
     return(texts)
 }
 
-#' Plot relative taxa abundances
+
+#' Plots relative distribution for taxa across samples.
+#'
+#' @param ps A phyloseq data set.
+#' @param level The taxonomy level to use. Defaults to phylum.
+#' @param sort Whether to sort taxa by abundance across all samples.
+#' @param max_taxa Maximum number of different taxa to plot. If more than 12
+#'  there is probably no color scale that can visualize them.
+#' @param only_data Only get the raw data for the plot as a data table.
+#' @return Nothing or a data.table containing the relative abundances.
+#' @examples
+#'  NULL
 #'
 #' @export
 plot_taxa <- function(ps, level="Phylum", sort=TRUE,
