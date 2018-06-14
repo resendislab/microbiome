@@ -10,11 +10,11 @@ This repo contains the standardized analysis pipeline for 16S and metagenome dat
 - Different pipelines are managed via branches. The master branch points to the default pipeline.
 - The project itself is managed in the [Trello Board](https://trello.com/b/rHtrpyiz/microbiome)
 
-For an examples analyzing a mock community see https://cdiener.github.io/microbiome.
+For an examples analyzing a mock community see https://resendislab.github.io/microbiome.
 
 ## Installation
 
-If you want to perform Human sequence removal you will need [bmtagger](ftp://ftp.ncbi.nlm.nih.gov/pub/agarwala/bmtagger/) installed. The tools are bundled in the `mbtools` R package which also depends on all additional packages you need to run
+If you want to perform Human sequence removal you will need [bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml) installed and a human reference. The tools are bundled in the `mbtools` R package which also depends on all additional packages you need to run
 the analyses. You will need to [install bioconductor first](https://www.bioconductor.org/install/) followed by running
 
 ```R
